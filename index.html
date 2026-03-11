@@ -24,7 +24,7 @@
   <a-assets>
     <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
     <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
-    <a-asset-item id="bee' src="bee.gltf"></a-asset-item>
+    <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
     <a-asset-item id="witch" src="witch.glb"></a-asset-item>
     <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
     <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
@@ -56,7 +56,7 @@
       var z = Math.random() * 10 - 5;
       var r = Math.random() * 180 - 90;
       bee.setAttribute('gltf-model','#bee');
-      bee.setAttribue('position', x + ' ' + y + ' ' + z);
+      bee.setAttribute('position', x + ' ' + y + ' ' + z);
       bee.setAttribute('scale', '0.01 0.01 0.01');
       bee.setAttribute('rotation', '0 ' + r + ' 0');
       bee.setAttribute('sound', 'src:#bzzz; volume: 0.1; poolSize: 10');
