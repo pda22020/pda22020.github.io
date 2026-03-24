@@ -5,32 +5,17 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <a-scene shadow="type: pcfsoft" antialias="true">
-        
-        <a-assets>
-            <img id="grid" src="https://img.gs/bb9jt7p9p9/50x50,repeat/https://i.imgur.com/mYmmS8n.png" crossorigin="anonymous">
-        </a-assets>
-
-        <a-sky color="#1a0000"></a-sky>
-
-        <a-box 
+    <a-scene shadow="type: pcfsoft">
+         <a-sky color="#1a0000"></a-sky>
+         <a-box 
             position="0 10 0" 
             width="40" height="20" depth="80" 
             color="#ff0000" 
             material="side: double; roughness: 1; src: #grid; repeat: 20 10"
             shadow="receive: true">
         </a-box>
-
-        <a-plane 
-            rotation="-90 0 0" 
-            width="40" height="80" 
-            color="#050505" 
-            material="src: #grid; repeat: 20 40; roughness: 0.5"
-            shadow="receive: true">
-        </a-plane>
-
         <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc; castShadow: true" position="0 15 -10"></a-entity>
-        <a-entity light="type: ambient; color: #400000; intensity: 0.7"></a-entity>
+        <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
 
         <a-entity id="rig" position="0 1.6 30">
             <a-camera fov="60" look-controls wasd-controls="acceleration: 150"></a-camera>
@@ -50,7 +35,5 @@
         <a-sphere position="10 5 -39.8" radius="1" color="#5C4033">
             <a-animation attribute="position" to="10 5 40" dur="4000" begin="500" repeat="indefinite" easing="linear"></a-animation>
         </a-sphere>
-
-    </a-scene>
-
+ </a-scene>
 </body>
