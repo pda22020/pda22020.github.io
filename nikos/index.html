@@ -1,52 +1,4 @@
 <head>
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script>
-    const scene = document.getElementById('scene');
-    let x = 0, y = 0, z = 0; // Θέση
-    let rotateX = 0, rotateY = 0; // Περιστροφή (μοίρες)
-    const speed = 20;
-    const sensitivity = 0.1; // Ευαισθησία ποντικιού
-
-    // Κλείδωμα ποντικιού με κλικ στο δωμάτιο
-    document.body.addEventListener('click', () => {
-        document.body.requestPointerLock();
-    });
-
-    // Έλεγχος κίνησης ποντικιού
-    document.addEventListener('mousemove', (e) => {
-        if (document.pointerLockElement === document.body) {
-            rotateY += e.movementX * sensitivity;
-            rotateX -= e.movementY * sensitivity;
-
-            // Περιορισμός στο πάνω-κάτω για να μην "τουμπάρει" η κάμερα
-            rotateX = Math.max(-80, Math.min(80, rotateX));
-            
-            updateTransform();
-        }
-    });
-
-    // Έλεγχος πλήκτρων WASD
-    document.addEventListener('keydown', (e) => {
-        const key = e.key.toLowerCase();
-        
-        // Υπολογισμός κίνησης βάσει της γωνίας που κοιτάμε (προαιρετικό για απλότητα εδώ)
-        if (key === 'w') z += speed;
-        if (key === 's') z -= speed;
-        if (key === 'a') x += speed;
-        if (key === 'd') x -= speed;
-
-        updateTransform();
-    });
-
-    function updateTransform() {
-        // Η σειρά έχει σημασία: Πρώτα η περιστροφή και μετά η μετατόπιση
-        scene.style.transform = `
-            rotateX(${rotateX}deg) 
-            rotateY(${rotateY}deg) 
-            translate3d(${x}px, ${y}px, ${z}px)
-        `;
-    }
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -57,21 +9,21 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
-            perspective: 800px; /* Η "κάμερα" μας */
+            perspective: 800px; 
         }
 
-        /* Ο "κόσμος" που μετακινείται */
         #scene {
             width: 100vw;
             height: 100vh;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.1s linear; /* Ομαλή κίνηση */
+            /* Μικρό transition για ομαλή κίνηση */
+            transition: transform 0.05s linear;
         }
 
         .wall {
             position: absolute;
-            width: 2000px; /* Μεγάλο δωμάτιο */
+            width: 2000px;
             height: 2000px;
             background: radial-gradient(circle, #ff1a1a 0%, #4d0000 100%);
             border: 2px solid rgba(0,0,0,0.5);
@@ -80,14 +32,12 @@
             align-items: center;
         }
 
-        /* Τοποθέτηση τοίχων στο χώρο */
         .back   { transform: translate3d(-50%, -50%, -1000px); left: 50%; top: 50%; width: 2000px; height: 1000px; }
         .floor  { transform: translate3d(-50%, -50%, 0) rotateX(90deg); left: 50%; top: 100%; width: 2000px; height: 2000px; background: repeating-linear-gradient(rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), #800000; }
         .ceil   { transform: translate3d(-50%, -50%, 0) rotateX(-90deg); left: 50%; top: 0%; width: 2000px; height: 2000px; background: #600000; }
         .left   { transform: translate3d(-1000px, -50%, 0) rotateY(90deg); left: 0; top: 50%; width: 2000px; height: 1000px; }
         .right  { transform: translate3d(0, -50%, 0) rotateY(-90deg); left: 100%; top: 50%; width: 2000px; height: 1000px; }
 
-        /* Φως στο ταβάνι */
         .light {
             position: absolute;
             top: 50%;
@@ -113,20 +63,45 @@
 
     <script>
         const scene = document.getElementById('scene');
-        let x = 0, y = 0, z = 0;
-        const step = 20; // Ταχύτητα κίνησης
+        
+        let x = 0, y = 0, z = 0; // Θέση
+        let rotX = 0, rotY = 0; // Περιστροφή
+        
+        const step = 25; 
+        const sensitivity = 0.15; // Ταχύτητα ποντικιού
 
+        // 1. Κλείδωμα ποντικιού με κλικ για FPS έλεγχο
+        document.body.addEventListener('click', () => {
+            document.body.requestPointerLock();
+        });
+
+        // 2. Έλεγχος Ποντικιού
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement === document.body) {
+                rotY -= e.movementX * sensitivity;
+                rotX += e.movementY * sensitivity;
+
+                // Περιορισμός για να μην κάνει "κωλοτούμπα" η κάμερα
+                rotX = Math.max(-80, Math.min(80, rotX));
+                
+                update();
+            }
+        });
+
+        // 3. Έλεγχος WASD
         document.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
-            
-            if (key === 'w') z += step; // Μπροστά
-            if (key === 's') z -= step; // Πίσω
-            if (key === 'a') x += step; // Αριστερά
-            if (key === 'd') x -= step; // Δεξιά
+            if (key === 'w') z += step;
+            if (key === 's') z -= step;
+            if (key === 'a') x += step;
+            if (key === 'd') x -= step;
 
-            // Ενημέρωση της θέσης του δωματίου (αντίστροφα από την κίνηση του παίκτη)
-            scene.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+            update();
         });
+
+        function update() {
+            // ΣΗΜΑΝΤΙΚΟ: Η σειρά rotate -> translate επιτρέπει να κοιτάμε γύρω από τον εαυτό μας
+            scene.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translate3d(${x}px, ${y}px, ${z}px)`;
+        }
     </script>
 </body>
-</html>
