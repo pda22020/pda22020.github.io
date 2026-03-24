@@ -3,106 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Μέσα στο Κόκκινο Δωμάτιο</title>
+    <title>Κόκκινο Δωμάτιο - WASD POV</title>
     <style>
-        /* Μηδενισμός περιθωρίων για πλήρη κάλυψη */
         body, html {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #000; /* Μαύρο φόντο έξω από το δωμάτιο */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px; /* Δημιουργεί την τρισδιάστατη προοπτική */
+            background-color: #000;
+            perspective: 800px; /* Η "κάμερα" μας */
         }
 
-        /* Ο κύριος χώρος του δωματίου */
-        .room-container {
+        /* Ο "κόσμος" που μετακινείται */
+        #scene {
             width: 100vw;
             height: 100vh;
             position: relative;
             transform-style: preserve-3d;
-            /* Αρχική γωνία θέασης (ελαφρώς προς τα κάτω) */
-            transform: translateY(50px) rotateX(-5deg);
+            transition: transform 0.1s linear; /* Ομαλή κίνηση */
         }
 
-        /* Κοινά στυλ για όλες τις επιφάνειες (τοίχους) */
         .wall {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            /* Βασικό κόκκινο με radial gradient για το φως */
-            background: radial-gradient(circle at center, #ff1a1a 0%, #990000 70%, #660000 100%);
-            border: 2px solid rgba(0, 0, 0, 0.3); /* Αχνές γραμμές για τις ενώσεις */
-            box-sizing: border-box;
+            width: 2000px; /* Μεγάλο δωμάτιο */
+            height: 2000px;
+            background: radial-gradient(circle, #ff1a1a 0%, #4d0000 100%);
+            border: 2px solid rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Πίσω τοίχος */
-        .wall-back {
-            transform: translateZ(-500px); /* Σπρώχνει τον τοίχο στο βάθος */
-            background: radial-gradient(circle at center, #ff4d4d 0%, #800000 80%, #4d0000 100%);
-        }
+        /* Τοποθέτηση τοίχων στο χώρο */
+        .back   { transform: translate3d(-50%, -50%, -1000px); left: 50%; top: 50%; width: 2000px; height: 1000px; }
+        .floor  { transform: translate3d(-50%, -50%, 0) rotateX(90deg); left: 50%; top: 100%; width: 2000px; height: 2000px; background: repeating-linear-gradient(rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), #800000; }
+        .ceil   { transform: translate3d(-50%, -50%, 0) rotateX(-90deg); left: 50%; top: 0%; width: 2000px; height: 2000px; background: #600000; }
+        .left   { transform: translate3d(-1000px, -50%, 0) rotateY(90deg); left: 0; top: 50%; width: 2000px; height: 1000px; }
+        .right  { transform: translate3d(0, -50%, 0) rotateY(-90deg); left: 100%; top: 50%; width: 2000px; height: 1000px; }
 
-        /* Αριστερός τοίχος */
-        .wall-left {
-            width: 1000px; /* Πρέπει να είναι διπλάσιος από το translateZ του πίσω τοίχου */
-            transform: rotateY(90deg) translateZ(-500px);
-            left: 0;
-        }
-
-        /* Δεξιός τοίχος */
-        .wall-right {
-            width: 1000px;
-            transform: rotateY(-90deg) translateZ(-500px);
-            right: 0;
-        }
-
-        /* Ταβάνι */
-        .wall-top {
-            height: 1000px;
-            transform: rotateX(-90deg) translateZ(-500px);
-            top: 0;
-            /* Ελαφρώς πιο σκοτεινό gradient για το ταβάνι */
-            background: radial-gradient(circle at center, #ff3333 0%, #660000 80%, #330000 100%);
-        }
-
-        /* Δάπεδο */
-        .wall-bottom {
-            height: 1000px;
-            transform: rotateX(90deg) translateZ(-500px);
-            bottom: 0;
-            /* Πιο έντονο gradient στο κέντρο για το φως που πέφτει */
-            background: radial-gradient(circle at center, #ff6666 0%, #800000 80%, #4d0000 100%);
-        }
-
-        /* Εφέ κεντρικής πηγής φωτός */
-        .light-source {
+        /* Φως στο ταβάνι */
+        .light {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) translateZ(-450px); /* Μπροστά από τον πίσω τοίχο */
-            width: 400px;
-            height: 400px;
-            background: rgba(255, 230, 230, 0.3);
-            filter: blur(100px);
-            border-radius: 50%;
-            pointer-events: none; /* Δεν εμποδίζει τα κλικ */
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,100,100,0.4) 0%, transparent 70%);
+            transform: translate3d(-50%, -50%, -500px);
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="room-container">
-        <div class="wall wall-back"></div>
-        <div class="wall wall-left"></div>
-        <div class="wall wall-right"></div>
-        <div class="wall wall-top"></div>
-        <div class="wall wall-bottom"></div>
-        
-        <div class="light-source"></div>
+    <div id="scene">
+        <div class="wall back"></div>
+        <div class="wall floor"></div>
+        <div class="wall ceil"></div>
+        <div class="wall left"></div>
+        <div class="wall right"></div>
+        <div class="light"></div>
     </div>
 
+    <script>
+        const scene = document.getElementById('scene');
+        let x = 0, y = 0, z = 0;
+        const step = 20; // Ταχύτητα κίνησης
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            if (key === 'w') z += step; // Μπροστά
+            if (key === 's') z -= step; // Πίσω
+            if (key === 'a') x += step; // Αριστερά
+            if (key === 'd') x -= step; // Δεξιά
+
+            // Ενημέρωση της θέσης του δωματίου (αντίστροφα από την κίνηση του παίκτη)
+            scene.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+        });
+    </script>
 </body>
 </html>
