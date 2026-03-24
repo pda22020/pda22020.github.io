@@ -1,55 +1,107 @@
+<!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Κόκκινο Δωμάτιο</title>
+    <title>Μέσα στο Κόκκινο Δωμάτιο</title>
     <style>
-        /* Μηδενισμός περιθωρίων */
+        /* Μηδενισμός περιθωρίων για πλήρη κάλυψη */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
-            background-color: #2b0000; /* Σκούρο κόκκινο για το βάθος */
-        }
-
-        /* Το "δωμάτιο" */
-        .room {
-            width: 100vw;
-            height: 100vh;
+            background-color: #000; /* Μαύρο φόντο έξω από το δωμάτιο */
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Gradient που προσομοιώνει το φως που πέφτει στους τοίχους */
-            background: radial-gradient(circle at center, #ff4d4d 0%, #800000 70%, #4d0000 100%);
-            position: relative;
+            perspective: 1000px; /* Δημιουργεί την τρισδιάστατη προοπτική */
         }
 
-        /* Εφέ πηγής φωτός (σαν λάμπα στο κέντρο) */
+        /* Ο κύριος χώρος του δωματίου */
+        .room-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            transform-style: preserve-3d;
+            /* Αρχική γωνία θέασης (ελαφρώς προς τα κάτω) */
+            transform: translateY(50px) rotateX(-5deg);
+        }
+
+        /* Κοινά στυλ για όλες τις επιφάνειες (τοίχους) */
+        .wall {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /* Βασικό κόκκινο με radial gradient για το φως */
+            background: radial-gradient(circle at center, #ff1a1a 0%, #990000 70%, #660000 100%);
+            border: 2px solid rgba(0, 0, 0, 0.3); /* Αχνές γραμμές για τις ενώσεις */
+            box-sizing: border-box;
+        }
+
+        /* Πίσω τοίχος */
+        .wall-back {
+            transform: translateZ(-500px); /* Σπρώχνει τον τοίχο στο βάθος */
+            background: radial-gradient(circle at center, #ff4d4d 0%, #800000 80%, #4d0000 100%);
+        }
+
+        /* Αριστερός τοίχος */
+        .wall-left {
+            width: 1000px; /* Πρέπει να είναι διπλάσιος από το translateZ του πίσω τοίχου */
+            transform: rotateY(90deg) translateZ(-500px);
+            left: 0;
+        }
+
+        /* Δεξιός τοίχος */
+        .wall-right {
+            width: 1000px;
+            transform: rotateY(-90deg) translateZ(-500px);
+            right: 0;
+        }
+
+        /* Ταβάνι */
+        .wall-top {
+            height: 1000px;
+            transform: rotateX(-90deg) translateZ(-500px);
+            top: 0;
+            /* Ελαφρώς πιο σκοτεινό gradient για το ταβάνι */
+            background: radial-gradient(circle at center, #ff3333 0%, #660000 80%, #330000 100%);
+        }
+
+        /* Δάπεδο */
+        .wall-bottom {
+            height: 1000px;
+            transform: rotateX(90deg) translateZ(-500px);
+            bottom: 0;
+            /* Πιο έντονο gradient στο κέντρο για το φως που πέφτει */
+            background: radial-gradient(circle at center, #ff6666 0%, #800000 80%, #4d0000 100%);
+        }
+
+        /* Εφέ κεντρικής πηγής φωτός */
         .light-source {
             position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 200, 200, 0.2);
-            filter: blur(80px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(-450px); /* Μπροστά από τον πίσω τοίχο */
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 230, 230, 0.3);
+            filter: blur(100px);
             border-radius: 50%;
-        }
-
-        /* Ένα απλό κείμενο */
-        .text {
-            color: white;
-            font-family: sans-serif;
-            font-size: 1.2rem;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-            z-index: 10;
+            pointer-events: none; /* Δεν εμποδίζει τα κλικ */
         }
     </style>
 </head>
 <body>
 
-    <div class="room">
+    <div class="room-container">
+        <div class="wall wall-back"></div>
+        <div class="wall wall-left"></div>
+        <div class="wall wall-right"></div>
+        <div class="wall wall-top"></div>
+        <div class="wall wall-bottom"></div>
+        
         <div class="light-source"></div>
-        <div class="text">Βρίσκεστε στο κόκκινο δωμάτιο.</div>
     </div>
 
 </body>
