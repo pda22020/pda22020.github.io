@@ -1,8 +1,54 @@
 <head>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script>
+    const scene = document.getElementById('scene');
+    let x = 0, y = 0, z = 0; // Θέση
+    let rotateX = 0, rotateY = 0; // Περιστροφή (μοίρες)
+    const speed = 20;
+    const sensitivity = 0.1; // Ευαισθησία ποντικιού
+
+    // Κλείδωμα ποντικιού με κλικ στο δωμάτιο
+    document.body.addEventListener('click', () => {
+        document.body.requestPointerLock();
+    });
+
+    // Έλεγχος κίνησης ποντικιού
+    document.addEventListener('mousemove', (e) => {
+        if (document.pointerLockElement === document.body) {
+            rotateY += e.movementX * sensitivity;
+            rotateX -= e.movementY * sensitivity;
+
+            // Περιορισμός στο πάνω-κάτω για να μην "τουμπάρει" η κάμερα
+            rotateX = Math.max(-80, Math.min(80, rotateX));
+            
+            updateTransform();
+        }
+    });
+
+    // Έλεγχος πλήκτρων WASD
+    document.addEventListener('keydown', (e) => {
+        const key = e.key.toLowerCase();
+        
+        // Υπολογισμός κίνησης βάσει της γωνίας που κοιτάμε (προαιρετικό για απλότητα εδώ)
+        if (key === 'w') z += speed;
+        if (key === 's') z -= speed;
+        if (key === 'a') x += speed;
+        if (key === 'd') x -= speed;
+
+        updateTransform();
+    });
+
+    function updateTransform() {
+        // Η σειρά έχει σημασία: Πρώτα η περιστροφή και μετά η μετατόπιση
+        scene.style.transform = `
+            rotateX(${rotateX}deg) 
+            rotateY(${rotateY}deg) 
+            translate3d(${x}px, ${y}px, ${z}px)
+        `;
+    }
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Κόκκινο Δωμάτιο - WASD POV</title>
     <style>
         body, html {
             margin: 0;
