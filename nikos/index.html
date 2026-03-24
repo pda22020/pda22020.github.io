@@ -1,107 +1,35 @@
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            perspective: 800px; 
-        }
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      
+      <a-sky color="#2b0000"></a-sky>
 
-        #scene {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            transform-style: preserve-3d;
-            /* Μικρό transition για ομαλή κίνηση */
-            transition: transform 0.05s linear;
-        }
+      <a-box 
+        position="0 5 0" 
+        width="20" height="10" depth="20" 
+        color="#ff0000" 
+        material="side: double; roughness: 0.8" 
+        shadow="receive: true">
+      </a-box>
 
-        .wall {
-            position: absolute;
-            width: 2000px;
-            height: 2000px;
-            background: radial-gradient(circle, #ff1a1a 0%, #4d0000 100%);
-            border: 2px solid rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+      <a-plane 
+        rotation="-90 0 0" 
+        width="20" height="20" 
+        color="#8b0000" 
+        metalness="0.2">
+      </a-plane>
 
-        .back   { transform: translate3d(-50%, -50%, -1000px); left: 50%; top: 50%; width: 2000px; height: 1000px; }
-        .floor  { transform: translate3d(-50%, -50%, 0) rotateX(90deg); left: 50%; top: 100%; width: 2000px; height: 2000px; background: repeating-linear-gradient(rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 2px, transparent 2px 50px), #800000; }
-        .ceil   { transform: translate3d(-50%, -50%, 0) rotateX(-90deg); left: 50%; top: 0%; width: 2000px; height: 2000px; background: #600000; }
-        .left   { transform: translate3d(-1000px, -50%, 0) rotateY(90deg); left: 0; top: 50%; width: 2000px; height: 1000px; }
-        .right  { transform: translate3d(0, -50%, 0) rotateY(-90deg); left: 100%; top: 50%; width: 2000px; height: 1000px; }
+      <a-light type="point" color="#ffcccc" intensity="1.5" position="0 8 0"></a-light>
+      <a-light type="ambient" color="#400000"></a-light>
 
-        .light {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255,100,100,0.4) 0%, transparent 70%);
-            transform: translate3d(-50%, -50%, -500px);
-            pointer-events: none;
-        }
-    </style>
-</head>
-<body>
+      <a-entity id="rig" position="0 1.6 0">
+        <a-camera look-controls wasd-controls="acceleration: 100"></a-camera>
+      </a-entity>
 
-    <div id="scene">
-        <div class="wall back"></div>
-        <div class="wall floor"></div>
-        <div class="wall ceil"></div>
-        <div class="wall left"></div>
-        <div class="wall right"></div>
-        <div class="light"></div>
-    </div>
-
-    <script>
-        const scene = document.getElementById('scene');
-        
-        let x = 0, y = 0, z = 0; // Θέση
-        let rotX = 0, rotY = 0; // Περιστροφή
-        
-        const step = 25; 
-        const sensitivity = 0.15; // Ταχύτητα ποντικιού
-
-        // 1. Κλείδωμα ποντικιού με κλικ για FPS έλεγχο
-        document.body.addEventListener('click', () => {
-            document.body.requestPointerLock();
-        });
-
-        // 2. Έλεγχος Ποντικιού
-        document.addEventListener('mousemove', (e) => {
-            if (document.pointerLockElement === document.body) {
-                rotY -= e.movementX * sensitivity;
-                rotX += e.movementY * sensitivity;
-
-                // Περιορισμός για να μην κάνει "κωλοτούμπα" η κάμερα
-                rotX = Math.max(-80, Math.min(80, rotX));
-                
-                update();
-            }
-        });
-
-        // 3. Έλεγχος WASD
-        document.addEventListener('keydown', (e) => {
-            const key = e.key.toLowerCase();
-            if (key === 'w') z += step;
-            if (key === 's') z -= step;
-            if (key === 'a') x += step;
-            if (key === 'd') x -= step;
-
-            update();
-        });
-
-        function update() {
-            // ΣΗΜΑΝΤΙΚΟ: Η σειρά rotate -> translate επιτρέπει να κοιτάμε γύρω από τον εαυτό μας
-            scene.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translate3d(${x}px, ${y}px, ${z}px)`;
-        }
-    </script>
-</body>
+    </a-scene>
+  </body>
+</html>
