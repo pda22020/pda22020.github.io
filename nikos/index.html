@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
 <head>
     <meta charset="utf-8">
     <title>Poopy-Shooty | Enhanced Edition</title>
-    <!-- Χρήση της τελευταίας σταθερής έκδοσης του A-Frame -->
     <script src="https://aframe.io"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
@@ -24,26 +21,11 @@
             color="#a80000" 
             material="side: double; roughness: 0.6; metalness: 0.2;"
             shadow="receive: true; castShadow: false">
-        </a-box>
-
-        <!-- ΚΕΝΤΡΙΚΟΣ ΦΩΤΙΣΜΟΣ: Point light που δημιουργεί ατμοσφαιρικές σκιές -->
-        
-        
-        
-        <!-- ΑΠΑΛΟΣ ΦΩΤΙΣΜΟΣ ΠΕΡΙΒΑΛΛΟΝΤΟΣ: Για να μην είναι εντελώς μαύρες οι σκιές -->
-        
-
-        <!-- ΚΑΜΕΡΑ: Ρυθμισμένη για ομαλή κίνηση -->
+        </a-box
         <a-camera fov="60" look-controls wasd-controls="acceleration: 150"></a-camera>
 
-        <!-- ΣΤΟΧΟΣ 1 (Κέντρο) -->
-        
             <a-circle radius="1.5" color="#111" material="roughness: 1"></a-circle>
             <a-sphere radius="1" color="#5C4033" material="roughness: 0.8; metalness: 0.1" shadow="castShadow: true"></a-sphere>
-        
-
-        <!-- ΣΤΟΧΟΣ 2 (Αριστερά - Κινούμενος) -->
-        <!-- Σημείωση: Το παλιό <a-animation> έχει καταργηθεί στο A-Frame. Χρησιμοποιούμε το component 'animation' -->
         
             <a-circle radius="1.5" color="#111" material="roughness: 1" rotation="0 0 0"></a-circle>
             <a-sphere radius="1" color="#5C4033" material="roughness: 0.8; metalness: 0.1" shadow="castShadow: true"></a-sphere>
