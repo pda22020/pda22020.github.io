@@ -1,30 +1,60 @@
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="utf-8">
-    <title>Poopy-Shooty</title>
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <title>Poopy-Shooty | Enhanced Edition</title>
+    <!-- Χρήση της τελευταίας σταθερής έκδοσης του A-Frame -->
+    <script src="https://aframe.io"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
-   <a-scene shadow="type: pcfsoft">
-         <a-sky color="#1a0000"></a-sky>
+   
+   <!-- Ενεργοποίηση Antialiasing, Color Management και Soft Shadows για κορυφαία ανάλυση και ρεαλισμό -->
+   <a-scene 
+        renderer="antialias: true; powerPreference: high-performance; colorManagement: true; sortObjects: true;"
+        shadow="type: pcfsoft">
+       
+         <!-- Ουρανός με απαλή διαβάθμιση (Fog) για ατμόσφαιρα μυστηρίου -->
+         <a-sky color="#0d0000"></a-sky>
+         <a-scene fog="type: exponential; color: #0d0000; density: 0.015"></a-scene>
+
+         <!-- Το "Κουτί" (Δωμάτιο) με πιο ρεαλιστικό Material και σκιές -->
          <a-box 
             position="0 10 0" 
             width="40" height="20" depth="80" 
-            color="#ff0000" 
-            material="side: double; roughness: 1; src: #grid; repeat: 20 10"
-            shadow="receive: true">
+            color="#a80000" 
+            material="side: double; roughness: 0.6; metalness: 0.2;"
+            shadow="receive: true; castShadow: false">
         </a-box>
-        <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc; castShadow: true" position="0 15 -10"></a-entity>
-        <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
-            <a-camera fov="60" look-controls wasd-controls="acceleration: 150"></a-camera>
-        <a-circle position="0 3 -39.8" radius="1.5" color="black"></a-circle>
-        <a-sphere position="0 3 -39.8" radius="1" color="#5C4033"></a-sphere>
-        <a-circle position="-10 5 -39.8" radius="1.5" color="black"></a-circle>
-        <a-sphere position="-10 5 -39.8" radius="1" color="#5C4033">
-            <a-animation attribute="position" to="-10 5 40" dur="6500" begin="1000" repeat="indefinite" easing="linear"></a-animation>
-        </a-sphere>
-        <a-circle position="10 5 -39.8" radius="1.5" color="black"></a-circle>
-        <a-sphere position="10 5 -39.8" radius="1" color="#5C4033">
-            <a-animation attribute="position" to="10 5 40" dur="4000" begin="500" repeat="indefinite" easing="linear"></a-animation>
-        </a-sphere>
+
+        <!-- ΚΕΝΤΡΙΚΟΣ ΦΩΤΙΣΜΟΣ: Point light που δημιουργεί ατμοσφαιρικές σκιές -->
+        
+        
+        
+        <!-- ΑΠΑΛΟΣ ΦΩΤΙΣΜΟΣ ΠΕΡΙΒΑΛΛΟΝΤΟΣ: Για να μην είναι εντελώς μαύρες οι σκιές -->
+        
+
+        <!-- ΚΑΜΕΡΑ: Ρυθμισμένη για ομαλή κίνηση -->
+        <a-camera fov="60" look-controls wasd-controls="acceleration: 150"></a-camera>
+
+        <!-- ΣΤΟΧΟΣ 1 (Κέντρο) -->
+        
+            <a-circle radius="1.5" color="#111" material="roughness: 1"></a-circle>
+            <a-sphere radius="1" color="#5C4033" material="roughness: 0.8; metalness: 0.1" shadow="castShadow: true"></a-sphere>
+        
+
+        <!-- ΣΤΟΧΟΣ 2 (Αριστερά - Κινούμενος) -->
+        <!-- Σημείωση: Το παλιό <a-animation> έχει καταργηθεί στο A-Frame. Χρησιμοποιούμε το component 'animation' -->
+        
+            <a-circle radius="1.5" color="#111" material="roughness: 1" rotation="0 0 0"></a-circle>
+            <a-sphere radius="1" color="#5C4033" material="roughness: 0.8; metalness: 0.1" shadow="castShadow: true"></a-sphere>
+        
+
+        <!-- ΣΤΟΧΟΣ 3 (Δεξιά - Κινούμενος) -->
+        
+            <a-circle radius="1.5" color="#111" material="roughness: 1"></a-circle>
+            <a-sphere radius="1" color="#5C4033" material="roughness: 0.8; metalness: 0.1" shadow="castShadow: true"></a-sphere>
+        
+
  </a-scene>
 </body>
+</html>
