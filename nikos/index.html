@@ -1,6 +1,9 @@
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8">
   <title>Poopy-Shooty</title>
+  <!-- Χρήση της σωστής βιβλιοθήκης -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 </head>
 
@@ -9,6 +12,7 @@
 <script>
 let score = 0;
 
+// Χειρισμός βολής με Space
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') shoot();
 });
@@ -23,6 +27,9 @@ function shoot() {
   let pos = camera.object3D.position.clone();
   let dir = new THREE.Vector3();
   camera.object3D.getWorldDirection(dir);
+  
+  // Στρέφουμε την κατεύθυνση μπροστά
+  dir.multiplyScalar(-1);
 
   bullet.setAttribute('position', pos);
 
@@ -34,25 +41,27 @@ function shoot() {
 
   document.querySelector('a-scene').appendChild(bullet);
 
-  setTimeout(() => bullet.remove(), 2500);
+  setTimeout(() => { if(bullet.parentNode) bullet.remove(); }, 2500);
 }
 
+// Κίνηση σφαίρας και έλεγχος σύγκρουσης
 AFRAME.registerComponent('bullet-move', {
   tick: function () {
     let el = this.el;
     let pos = el.object3D.position;
 
-    pos.x += parseFloat(el.dataset.dx) * 0.6;
-    pos.y += parseFloat(el.dataset.dy) * 0.6;
-    pos.z += parseFloat(el.dataset.dz) * 0.6;
+    pos.x += parseFloat(el.dataset.dx) * 0.8;
+    pos.y += parseFloat(el.dataset.dy) * 0.8;
+    pos.z += parseFloat(el.dataset.dz) * 0.8;
 
     document.querySelectorAll('.enemy').forEach(enemy => {
       let ep = enemy.object3D.position;
-      if (pos.distanceTo(ep) < 1) {
-        enemy.remove();
-        el.remove();
+      if (pos.distanceTo(ep) < 1.5) {
+        if(enemy.parentNode) enemy.remove();
+        if(el.parentNode) el.remove();
 
         score++;
+        // Ενημέρωση του Score στο POV
         document.querySelector('#score')
           .setAttribute('value', 'Score: ' + score);
       }
@@ -60,18 +69,32 @@ AFRAME.registerComponent('bullet-move', {
   }
 });
 
+// Κίνηση των εχθρών προς τον παίκτη και έλεγχος Game Over
 AFRAME.registerComponent('enemy-ai', {
   tick: function () {
     let player = document.querySelector('a-camera');
-    let dist = this.el.object3D.position.distanceTo(player.object3D.position);
+    let playerPos = player.object3D.position;
+    let enemyPos = this.el.object3D.position;
 
-    if (dist < 2) {
-      alert("Game Over");
+    // Υπολογισμός κατεύθυνσης προς τον παίκτη
+    let dir = new THREE.Vector3().subVectors(playerPos, enemyPos).normalize();
+    
+    // Ταχύτητα κίνησης των εχθρών
+    let speed = 0.15; 
+    enemyPos.x += dir.x * speed;
+    enemyPos.y += dir.y * speed;
+    enemyPos.z += dir.z * speed;
+
+    let dist = enemyPos.distanceTo(playerPos);
+
+    if (dist < 2.5) {
+      alert("Game Over! Τελικό Σκορ: " + score);
       location.reload();
     }
   }
 });
 
+// Spawn εχθρών
 setInterval(() => {
   let enemy = document.createElement('a-sphere');
 
@@ -79,15 +102,16 @@ setInterval(() => {
   enemy.setAttribute('radius', '1');
   enemy.setAttribute('color', '#5C4033');
 
-  let x = Math.random() * 20 - 10;
-  let y = Math.random() * 5 + 2;
+  let x = Math.random() * 30 - 15;
+  let y = Math.random() * 5 + 1;
 
   enemy.setAttribute('position', `${x} ${y} -40`);
   enemy.setAttribute('enemy-ai', '');
 
   document.querySelector('a-scene').appendChild(enemy);
-}, 1800);
+}, 1500);
 
+// Ενεργοποίηση κίνησης στις σφαίρες
 setInterval(() => {
   document.querySelectorAll('.bullet').forEach(b => {
     if (!b.components['bullet-move']) {
@@ -100,22 +124,31 @@ setInterval(() => {
 
 <a-scene>
 
+  <!-- Το Δωμάτιο -->
   <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
 
-  <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
-  <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
+  <!-- Φωτισμός -->
+  
+  
 
+  <!-- ΚΑΜΕΡΑ (POV) -->
   <a-camera wasd-controls look-controls>
+    <!-- Το Στόχαστρο -->
     <a-cursor color="yellow"></a-cursor>
 
-    <a-entity geometry="primitive: box"
-              material="color: black"
-              position="0.4 -0.4 -0.8"
-              scale="0.2 0.2 0.6"></a-entity>
-  </a-camera>
+    <!-- Το Όπλο -->
+    
 
-  <a-text id="score" value="Score: 0" position="-2 2 -3" color="white"></a-text>
+    <!-- ΤΟ ΣΚΟΡ ΣΤΟ POV (Δεσμευμένο πάνω στην κάμερα) -->
+    <a-text id="score" 
+            value="Score: 0" 
+            position="-0.8 0.5 -1" 
+            scale="0.4 0.4 0.4"
+            color="white">
+    </a-text>
+  </a-camera>
 
 </a-scene>
 
 </body>
+</html>
