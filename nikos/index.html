@@ -22,15 +22,12 @@ AFRAME.registerComponent('enemy-ai', {
     let dist = this.el.object3D.position.distanceTo(
       player.object3D.position
     );
-
     if (dist < 2) {
       alert("Game Over");
       location.reload();
     }
   }
 });
-
-// Spawn enemies
 setInterval(() => {
   let enemy = document.createElement('a-sphere');
 
@@ -51,15 +48,8 @@ setInterval(() => {
 
   document.querySelector('a-scene').appendChild(enemy);
 }, 2000);
-
 </script>
-
 <a-scene shadow="type: pcfsoft">
-
-  <!-- Sky -->
-  <a-sky color="#1a0000"></a-sky>
-
-  <!-- Room -->
   <a-box 
     position="0 10 0" 
     width="40" height="20" depth="80" 
@@ -67,12 +57,8 @@ setInterval(() => {
     material="side: double"
     shadow="receive: true">
   </a-box>
-
-  <!-- Lights -->
-  <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
+ <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
   <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
-
-  <!-- Camera + cursor -->
   <a-camera fov="60" wasd-controls look-controls>
     <a-cursor raycaster="objects: .enemy" color="yellow"></a-cursor>
   </a-camera>
