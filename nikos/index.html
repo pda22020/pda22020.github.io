@@ -4,48 +4,75 @@
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
 </head>
+
 <body style="margin: 0; overflow: hidden;">
+
 <script>
+let score = 0;
+
 document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') shoot();
 });
+
 function shoot() {
   let camera = document.querySelector('a-camera');
- let bullet = document.createElement('a-sphere');
+
+  let bullet = document.createElement('a-sphere');
   bullet.setAttribute('radius', '0.2');
   bullet.setAttribute('color', 'yellow');
-  let pos = camera.getAttribute('position');
-  bullet.setAttribute('position', pos);
+
+  let pos = camera.object3D.position;
+  bullet.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+
+  bullet.setAttribute('dynamic-body', 'mass: 0.1');
+  bullet.setAttribute('class', 'bullet');
+
+  document.querySelector('a-scene').appendChild(bullet);
+
   let direction = new THREE.Vector3();
   camera.object3D.getWorldDirection(direction);
-  bullet.setAttribute('velocity', `${direction.x * 20} ${direction.y * 20} ${direction.z * 20}`);
-  bullet.setAttribute('class', 'bullet');
-  document.querySelector('a-scene').appendChild(bullet);
-  setTimeout(() => bullet.remove(), 3000);
-}
-  let score = 0;
-AFRAME.registerComponent('shootable', {
-  init: function () {
-    this.el.addEventListener('click', () => {
-      this.el.setAttribute('visible', false);
+
+  setTimeout(() => {
+    if (bullet.body) {
+      bullet.body.velocity.set(
+        direction.x * 25,
+        direction.y * 25,
+        direction.z * 25
+      );
+    }
+  }, 50);
+
+  bullet.addEventListener('collide', (e) => {
+    let target = e.detail.body.el;
+
+    if (target.classList.contains('enemy')) {
+      target.remove();
+      bullet.remove();
+
       score++;
       document.querySelector('#score')
         .setAttribute('value', 'Score: ' + score);
-    });
-  }
-});
+    }
+  });
+
+  setTimeout(() => bullet.remove(), 3000);
+}
+
 AFRAME.registerComponent('enemy-ai', {
   tick: function () {
     let player = document.querySelector('a-camera');
+
     let dist = this.el.object3D.position.distanceTo(
       player.object3D.position
     );
+
     if (dist < 2) {
       alert("Game Over");
       location.reload();
     }
   }
 });
+
 setInterval(() => {
   let enemy = document.createElement('a-sphere');
 
@@ -57,8 +84,7 @@ setInterval(() => {
   let y = Math.random() * 5 + 2;
 
   enemy.setAttribute('position', `${x} ${y} -40`);
-
-  enemy.setAttribute('shootable', '');
+  enemy.setAttribute('dynamic-body', 'mass: 1');
   enemy.setAttribute('enemy-ai', '');
 
   enemy.setAttribute('animation',
@@ -67,23 +93,22 @@ setInterval(() => {
   document.querySelector('a-scene').appendChild(enemy);
 }, 2000);
 </script>
-<a-scene 
-  physics="gravity: 0", 
-  shadow="type: pcfsoft">
-  <a-box 
-    position="0 10 0" 
-    width="40" height="20" depth="80" 
-    color="#ff0000"
-    material="side: double"
-    shadow="receive: true">
-  </a-box>
- <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
+
+<a-scene physics="gravity: 0" shadow="type: pcfsoft">
+
+  <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
+
+  <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
   <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
+
   <a-camera fov="60" wasd-controls look-controls>
-    <a-cursor raycaster="objects: .enemy" color="yellow"></a-cursor>
+    <a-cursor color="yellow"></a-cursor>
+
+    <a-entity geometry="primitive: box" material="color: black" position="0.4 -0.4 -0.8" scale="0.2 0.2 0.6"></a-entity>
   </a-camera>
 
-  <!-- Score -->
   <a-text id="score" value="Score: 0" position="-2 2 -3" color="white"></a-text>
+
 </a-scene>
+
 </body>
