@@ -2,7 +2,6 @@
   <meta charset="utf-8">
   <title>Poopy-Shooty</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
@@ -18,53 +17,58 @@ function shoot() {
   let camera = document.querySelector('a-camera');
 
   let bullet = document.createElement('a-sphere');
-  bullet.setAttribute('radius', '0.2');
+  bullet.setAttribute('radius', '0.15');
   bullet.setAttribute('color', 'yellow');
 
-  let pos = camera.object3D.position;
-  bullet.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+  let pos = camera.object3D.position.clone();
+  let dir = new THREE.Vector3();
+  camera.object3D.getWorldDirection(dir);
 
-  bullet.setAttribute('dynamic-body', 'mass: 0.1');
+  bullet.setAttribute('position', pos);
+
+  bullet.dataset.dx = dir.x;
+  bullet.dataset.dy = dir.y;
+  bullet.dataset.dz = dir.z;
+
   bullet.setAttribute('class', 'bullet');
 
   document.querySelector('a-scene').appendChild(bullet);
 
-  let direction = new THREE.Vector3();
-  camera.object3D.getWorldDirection(direction);
-
-  setTimeout(() => {
-    if (bullet.body) {
-      bullet.body.velocity.set(
-        direction.x * 25,
-        direction.y * 25,
-        direction.z * 25
-      );
-    }
-  }, 50);
-
-  bullet.addEventListener('collide', (e) => {
-    let target = e.detail.body.el;
-
-    if (target.classList.contains('enemy')) {
-      target.remove();
-      bullet.remove();
-
-      score++;
-      document.querySelector('#score')
-        .setAttribute('value', 'Score: ' + score);
-    }
-  });
-
-  setTimeout(() => bullet.remove(), 3000);
+  setTimeout(() => bullet.remove(), 2000);
 }
+
+AFRAME.registerComponent('bullet-move', {
+  tick: function () {
+    let el = this.el;
+    let pos = el.object3D.position;
+
+    pos.x += parseFloat(el.dataset.dx) * 0.5;
+    pos.y += parseFloat(el.dataset.dy) * 0.5;
+    pos.z += parseFloat(el.dataset.dz) * 0.5;
+
+    let enemies = document.querySelectorAll('.enemy');
+
+    enemies.forEach(enemy => {
+      let ep = enemy.object3D.position;
+
+      let dist = pos.distanceTo(ep);
+
+      if (dist < 1) {
+        enemy.remove();
+        el.remove();
+
+        score++;
+        document.querySelector('#score')
+          .setAttribute('value', 'Score: ' + score);
+      }
+    });
+  }
+});
 
 AFRAME.registerComponent('enemy-ai', {
   tick: function () {
     let player = document.querySelector('a-camera');
-
-    let dist = this.el.object3D.position.distanceTo(
-      player.object3D.position
-    );
+    let dist = this.el.object3D.position.distanceTo(player.object3D.position);
 
     if (dist < 2) {
       alert("Game Over");
@@ -84,31 +88,38 @@ setInterval(() => {
   let y = Math.random() * 5 + 2;
 
   enemy.setAttribute('position', `${x} ${y} -40`);
-  enemy.setAttribute('dynamic-body', 'mass: 1');
   enemy.setAttribute('enemy-ai', '');
 
   enemy.setAttribute('animation',
     'property: position; to: 0 3 5; dur: 3000; easing: linear');
 
   document.querySelector('a-scene').appendChild(enemy);
-}, 2000);
+}, 1500);
+
 </script>
 
-<a-scene physics="gravity: 0" shadow="type: pcfsoft">
+<a-scene>
 
-  <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
+  <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000"></a-box>
 
-  <a-entity light="type: point; intensity: 1.5; distance: 100; color: #ffcccc" position="0 15 -10"></a-entity>
-  <a-entity light="type: ambient; color: #480000; intensity: 0.7"></a-entity>
-
-  <a-camera fov="60" wasd-controls look-controls>
-    <a-cursor color="yellow"></a-cursor>
-
-    <a-entity geometry="primitive: box" material="color: black" position="0.4 -0.4 -0.8" scale="0.2 0.2 0.6"></a-entity>
+  <a-camera wasd-controls look-controls>
+    <a-cursor></a-cursor>
   </a-camera>
 
   <a-text id="score" value="Score: 0" position="-2 2 -3" color="white"></a-text>
 
 </a-scene>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(() => {
+    document.querySelectorAll('.bullet').forEach(b => {
+      if (!b.components['bullet-move']) {
+        b.setAttribute('bullet-move', '');
+      }
+    });
+  }, 50);
+});
+</script>
 
 </body>
