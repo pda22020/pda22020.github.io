@@ -1,68 +1,128 @@
-
+<!DOCTYPE html>
+<html>
 <head>
+  <meta charset="utf-8">
+  <title>Poopy-Shooty VR</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
-<script>
-  AFRAME.registerComponent('sounding',{
-    tick: function () {
-      if (Math.random() < 0.99) return;
-        var sound = this.el.components.sound;
-      if (sound) sound.playSound();
-    }
-  });
-</script>
 </head>
-<body>
-  <a-scene id="s1" background="color:#0d0928" fog="far:300" shadow="type: pcfsoft">
-    <a-camera position="0 3 0"></a-camera>
-    <a-sphere radius="500" position="0 5000 0" material="fog: false"></a-sphere>
-    <a-entity position="0 250 0" light="type: directional; intensity: 0.5; castShadow: true;
-      shadowCameraBottom: -500; shadowCameraTop: 500; shadowCameraLeft: -500; shadowCameraRight: 500">
-      </a-entity> 
-    <a-light type="ambient" intensity="0.25"></a-light>
-    <a-plane color="#2a1c0e" height="1000" width="1000" rotation="-90 0 0" metalness="0" shadow></a-plane>
-  <a-assets>
-    <a-asset-item id="tree" src="tree.gltf"></a-asset-item>
-    <a-asset-item id="bird" src="bird.gltf"></a-asset-item>
-    <a-asset-item id="bee" src="bee.gltf"></a-asset-item>
-    <a-asset-item id="witch" src="witch.glb"></a-asset-item>
-    <audio id="hawk" src="Hawk Call 2x-SoundBible.com-1697796838.mp3"></audio>
-    <audio id="bzzz" src="Bee-SoundBible.com-914644763.mp3"></audio>
-  </a-assets>
-    <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="-50 25 -50"
-      sound="src:#hawk; poolSize: 2" sounding></a-entity>
-    <a-entity gltf-model="#bird" scale="5 5 5" shadow="receive: false" position="50 25 -50" rotation="0 180 0"
-      sound="src:#hawk; poolSize: 2" sounding></a-entity>
-  </a-scene>
-  <script>
-    var scene1 = document.getElementById('s1')
-    for (var i= 0; i < 400; i++) {
-      var tree = document.createElement('a-entity');
-      var x = Math.random() * 800 - 400;
-      var z = Math.random() * 800 - 400;
-      var s = Math.random() * 15 + 5;
-      var r = Math.random() * 180 - 90;
-      tree.setAttribute('gltf-model','#tree');
-      tree.setAttribute('position', x + ' 0 ' + z);
-      tree.setAttribute('scale', s+ ' '+s + ' '+s);
-      tree.setAttribute('rotation','0 ' + r + ' 0');
-      tree.setAttribute('shadow', 'receive: false');
-      scene1.appendChild(tree);
-    }
-      for (var i = 0; i < 10; i++) {
-      var bee = document.createElement('a-entity');
-      var x = Math.random() * 10 - 5;
-      var y = Math.random() * 3 + 3;
-      var z = Math.random() * 10 - 5;
-      var r = Math.random() * 180 - 90;
-      bee.setAttribute('gltf-model','#bee');
-      bee.setAttribute('position', x + ' ' + y + ' ' + z);
-      bee.setAttribute('scale', '0.01 0.01 0.01');
-      bee.setAttribute('rotation', '0 ' + r + ' 0');
-      bee.setAttribute('sound', 'src:#bzzz; volume: 0.1; poolSize: 10');
-      bee.setAttribute('sounding', ' ');
-      scene1.appendChild(bee);
-    }
-  </script>
-</body>
+<body style="margin: 0; overflow: hidden;">
+<script>
+ let score = 0;
 
+ // Συνάρτηση βολής που δέχεται το controller ως σημείο εκκίνησης
+ function shoot(controllerEl) {
+  let scene = document.querySelector('a-scene');
+  let bullet = document.createElement('a-sphere');
+  bullet.setAttribute('radius', '0.15');
+  bullet.setAttribute('color', 'yellow');
+  
+  // Παίρνουμε τη θέση και την κατεύθυνση του χειριστηρίου
+  let pos = new THREE.Vector3();
+  controllerEl.object3D.getWorldPosition(pos);
+  
+  let dir = new THREE.Vector3(0, 0, -1);
+  dir.applyQuaternion(controllerEl.object3D.quaternion);
+  
+  bullet.setAttribute('position', pos);
+  bullet.dataset.dx = dir.x;
+  bullet.dataset.dy = dir.y;
+  bullet.dataset.dz = dir.z;
+  bullet.setAttribute('class', 'bullet');
+  bullet.setAttribute('bullet-move', ''); // Προσθήκη κίνησης αμέσως
+  scene.appendChild(bullet);
+  
+  setTimeout(() => { if(bullet.parentNode) bullet.remove(); }, 2500);
+}
+
+// Component για την κίνηση της σφαίρας
+AFRAME.registerComponent('bullet-move', {
+  tick: function () {
+    let el = this.el;
+    let pos = el.object3D.position;
+    pos.x += parseFloat(el.dataset.dx) * 0.8;
+    pos.y += parseFloat(el.dataset.dy) * 0.8;
+    pos.z += parseFloat(el.dataset.dz) * 0.8;
+
+    document.querySelectorAll('.enemy').forEach(enemy => {
+      let ep = enemy.object3D.position;
+      if (pos.distanceTo(ep) < 1.5) {
+        if(enemy.parentNode) enemy.remove();
+        if(el.parentNode) el.remove();
+        score++;
+        document.querySelector('#score').setAttribute('value', 'Score: ' + score);
+      }
+    });
+  }
+});
+
+// Component για την κίνηση του εχθρού προς τον παίκτη
+AFRAME.registerComponent('enemy-ai', {
+  tick: function () {
+    let camera = document.querySelector('a-camera');
+    let playerPos = camera.object3D.position;
+    let enemyPos = this.el.object3D.position;
+    let dir = new THREE.Vector3().subVectors(playerPos, enemyPos).normalize();
+    let speed = 0.05; // Μειωμένη ταχύτητα για VR για να είναι δίκαιο
+    
+    enemyPos.x += dir.x * speed;
+    enemyPos.y += dir.y * speed;
+    enemyPos.z += dir.z * speed;
+
+    if (enemyPos.distanceTo(playerPos) < 1.5) {
+      alert("Game Over! Σκορ: " + score);
+      location.reload();
+    }
+  }
+});
+
+// Listener για το πάτημα της σκανδάλης (trigger) στα controllers
+AFRAME.registerComponent('controller-listener', {
+  init: function () {
+    this.el.addEventListener('triggerdown', (e) => {
+      shoot(this.el);
+    });
+  }
+});
+
+// Δημιουργία εχθρών κάθε 2 δευτερόλεπτα
+setInterval(() => {
+  let scene = document.querySelector('a-scene');
+  if(!scene) return;
+  let enemy = document.createElement('a-sphere');
+  enemy.setAttribute('class', 'enemy');
+  enemy.setAttribute('radius', '0.8');
+  enemy.setAttribute('color', '#5C4033');
+  
+  // Εμφάνιση εχθρών σε τυχαία σημεία γύρω από τον παίκτη
+  let angle = Math.random() * Math.PI * 2;
+  let dist = 25;
+  let x = Math.cos(angle) * dist;
+  let z = Math.sin(angle) * dist;
+  
+  enemy.setAttribute('position', `${x} 1.5 ${z}`);
+  enemy.setAttribute('enemy-ai', '');
+  scene.appendChild(enemy);
+}, 2000);
+</script>
+
+<a-scene>
+  <!-- Περιβάλλον -->
+  <a-sky color="#87CEEB"></a-sky>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#222"></a-plane>
+
+  <!-- Camera & Score UI (δεμένο στην κάμερα) -->
+  <a-camera wasd-controls look-controls>
+    <a-text id="score" 
+            value="Score: 0" 
+            position="0 0.5 -1" 
+            align="center"
+            color="white"></a-text>
+  </a-camera>
+
+  <!-- VR Controllers -->
+  
+  
+
+</a-scene>
+</body>
+</html>
