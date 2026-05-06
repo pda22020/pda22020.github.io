@@ -6,6 +6,15 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 <script>
+  AFRAME.registerComponent('boundary', {
+  tick: function () {
+    let pos = this.el.object3D.position;
+    if (pos.x < -19) pos.x = -19;
+    if (pos.x > 19) pos.x = 19;
+    if (pos.z < -19) pos.z = -19;
+    if (pos.z > 19) pos.z = 19;
+  }
+});
  let score = 0;
  document.addEventListener('keydown', (e) => {
   if (e.code === 'Space') shoot();
@@ -91,16 +100,5 @@ setInterval(() => {
     <a-text id="score" value="Score: 0" position="-0.8 0.5 -1" scale="0.4 0.4 0.4" color="white"></a-text>
   </a-camera>
 </a-scene>
-<script>
-AFRAME.registerComponent('boundary', {
-  tick: function () {
-    let pos = this.el.object3D.position;
-    if (pos.x < -19) pos.x = -19;
-    if (pos.x > 19) pos.x = 19;
-    if (pos.z < -19) pos.z = -19;
-    if (pos.z > 19) pos.z = 19;
-  }
-});
-</script>
 </a-scene>
 </body>
