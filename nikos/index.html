@@ -73,11 +73,21 @@ AFRAME.registerComponent('enemy-ai', {
     enemyPos.z += dir.z * speed;
     let dist = enemyPos.distanceTo(playerPos);
     if (dist < 2.5) {
-     text("Game Over! Τελικό Σκορ: " + score);
-      location.reload();
+      let gameOverText = document.querySelector('#game-over-screen');
+
+      gameOverText.setAttribute('value', "GAME OVER\nScore: " + score);
+      gameOverText.setAttribute('visible', 'true');
+      setTimeout(function() {
+        location.reload();
+      }, 3000);
     }
   }
 });
+    // text("Game Over! Τελικό Σκορ: " + score);
+     /// location.reload();
+   /// }
+ /// }
+///});
 setInterval(() => {
   let enemy = document.createElement('a-sphere');
   enemy.setAttribute('class', 'enemy');
