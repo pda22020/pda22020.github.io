@@ -73,7 +73,7 @@ AFRAME.registerComponent('enemy-ai', {
     enemyPos.z += dir.z * speed;
     let dist = enemyPos.distanceTo(playerPos);
     if (dist < 2.5) {
-      alert("Game Over! Τελικό Σκορ: " + score);
+      message("Game Over! Τελικό Σκορ: " + score);
       location.reload();
     }
   }
