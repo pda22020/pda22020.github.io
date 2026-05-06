@@ -84,14 +84,27 @@ setInterval(() => {
 }, 50);
 </script>
 <a-scene>
-  <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
-  <a-camera wasd-controls look-controls>
+  <a-scene>
+  <!-- Το κουτί/δωμάτιο -->
+  <a-box position="0 5 0" width="40" height="10" depth="40" color="#ff0000" material="side: double; wireframe: false"></a-box>
+
+  <!-- Η κάμερα με το νέο component 'boundary' -->
+  <a-camera wasd-controls look-controls boundary>
     <a-cursor color="yellow"></a-cursor>
-    <a-text id="score" 
-            value="Score: 0" 
-            position="-0.8 0.5 -1" 
-            scale="0.4 0.4 0.4"
-            color="white"></a-text>
+    <a-text id="score" value="Score: 0" position="-0.8 0.5 -1" scale="0.4 0.4 0.4" color="white"></a-text>
   </a-camera>
+</a-scene>
+
+<script>
+AFRAME.registerComponent('boundary', {
+  tick: function () {
+    let pos = this.el.object3D.position;
+    if (pos.x < -19) pos.x = -19;
+    if (pos.x > 19) pos.x = 19;
+    if (pos.z < -19) pos.z = -19;
+    if (pos.z > 19) pos.z = 19;
+  }
+});
+</script>
 </a-scene>
 </body>
