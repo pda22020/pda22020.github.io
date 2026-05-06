@@ -73,25 +73,7 @@ AFRAME.registerComponent('enemy-ai', {
     enemyPos.z += dir.z * speed;
     let dist = enemyPos.distanceTo(playerPos);
     if (dist < 2.5) {
-        <a-text 
-      id="game-over-text" 
-      value="WASTED" 
-      color="#FF0000" 
-      align="center" 
-      position="0 0 -1" 
-      scale="2 2 2"
-      visible="false">
-    </a-text>
-    <a-plane 
-      id="overlay"
-      color="#000" 
-      opacity="0.5" 
-      position="0 0 -1.1" 
-      width="10" 
-      height="10"
-      visible="false">
-    </a-plane>
-      //  message("Game Over! Τελικό Σκορ: " + score);
+     text("Game Over! Τελικό Σκορ: " + score);
       location.reload();
     }
   }
