@@ -6,15 +6,7 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 <script>
-    var locked = true, tool = false, gas = true, message = "", time = 5000, coords;
-
-        AFRAME.registerComponent('updating', {
-            init: function () {
-                coords = document.getElementById('cam');
-                document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
-                document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam'); });
-            }
-  AFRAME.registerComponent('boundary', {
+ AFRAME.registerComponent('boundary', {
   tick: function () {
     let pos = this.el.object3D.position;
     if (pos.x < -19) pos.x = -19;
