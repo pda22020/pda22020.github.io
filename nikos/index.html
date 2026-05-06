@@ -2,6 +2,7 @@
   <meta charset="utf-8">
   <title>Poopy-Shooty</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 <script>
@@ -84,6 +85,12 @@ setInterval(() => {
 </script>
 <a-scene>
   <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
+   var pos = coords.getAttribute('position');
+                if (pos.x < -19) pos.x = -19;
+                if (pos.x > 19) pos.x = 19;
+                if (pos.z < -19) pos.z = -19;
+                if (pos.z > 19) pos.z = 19;
+                coords.setAttribute('position', pos);
   <a-camera wasd-controls look-controls>
     <a-cursor color="yellow"></a-cursor>
     <a-text id="score" 
