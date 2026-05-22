@@ -1,408 +1,80 @@
-<!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8">
-
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.min.js"></script>
     <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
-
     <script>
-
-        var locked = true,
-            tool = false,
-            rain = true,
-            message = "",
-            time = 5000,
-            coords;
-
-        AFRAME.registerComponent('updating', {
-
+     var locked = true, tool = false, rain = true, message = "", time = 5000, coords;
+       AFRAME.registerComponent('updating', {
             init: function () {
-
                 coords = document.getElementById('cam');
-
-                document.querySelector('a-scene')
-                    .addEventListener('enter-vr', function () {
-
-                        coords = document.getElementById('rig');
-
-                    });
-
-                document.querySelector('a-scene')
-                    .addEventListener('exit-vr', function () {
-
-                        coords = document.getElementById('cam');
-
-                    });
+                document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
+                document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam'); });
             },
-
-            tick: function () {
-
+              tick: function () {
                 if (rain) time--;
-
                 if (time < 0) message = "Game over :(...";
-
-                if (message != "") {
-                    this.el.setAttribute('value', message);
-                }
-                else {
-                    this.el.setAttribute(
-                        'value',
-                        '' + Math.round(time / 100)
-                    );
-                }
-
-                var pos = coords.getAttribute('position');
-
-                if (pos.x < -19) pos.x = -19;
-                if (pos.x > 19) pos.x = 19;
-
-                if (pos.z < -19) pos.z = -19;
-                if (pos.z > 19) pos.z = 19;
-
+                if (message != "") this.el.setAttribute('value', message);
+                else this.el.setAttribute('value', '' + Math.round(time / 100));
+             var pos = coords.getAttribute('position');
+                if (pos.x < -20) pos.x = -20;
+                if (pos.x > 20) pos.x = 20;
+                if (pos.z < -20) pos.z = -20;
+                if (pos.z > 20) pos.z = 20;
                 coords.setAttribute('position', pos);
             }
         });
-
         AFRAME.registerComponent('focusing', {
-
             init: function () {
-
                 var el = this.el;
-
                 el.addEventListener('mouseenter', function () {
-
                     var pos = coords.getAttribute('position');
-
-                    // Door
                     if (el.id == "door") {
-
                         if (!locked && time >= 0) {
-
                             el.components.sound.playSound();
-
                             message = "Well done!";
                         }
-
                         return;
                     }
-
-                    // Window
-                    else if (el.id == "window") {
-
+           else if (el.id == "window") {
                         if (tool) {
-
-                            // Σταματάει η βροχή
+                            document.querySelector('a-scene').removeAttribute('animation');
+                            document.querySelector('a-scene').setAttribute('animation', 'property: rain.far; to: 1000; dur: 50000');
                             rain = false;
-
-                            // Σβήνει όλες τις σταγόνες
-                            var drops = document.querySelectorAll('.drop');
-
-                            drops.forEach(function (drop) {
-
-                                drop.remove();
-
-                            });
-
                             el.components.sound.playSound();
-
-                            el.setAttribute(
-                                'blending',
-                                'subtractive'
-                            );
+                            el.setAttribute('blending', 'subtractive');
                         }
-
                         return;
-                    }
-
-                    // Pickup animation
-                    el.removeAttribute('dynamic-body');
-
-                    el.setAttribute(
-                        'animation',
-                        'property: position; to: ' +
-                        pos.x + ' 0 ' + pos.z
-                    );
-
-                    // Torch
-                    if (el.id == "torch") {
-
-                        document.getElementById('light')
-                            .setAttribute(
-                                'animation',
-                                'property: visible; to: true'
-                            );
-                    }
-
-                    // Key
-                    else if (el.id == "key") {
-
-                        locked = false;
-                    }
-
-                    // Hammer
-                    else if (el.id == "hammer") {
-
-                        tool = true;
-                    }
-
-                    setTimeout(function () {
-
-                        el.remove();
-
-                    }, 3000);
+                    }          
+                el.removeAttribute('dynamic-body');
+               el.setAttribute('animation',  'property: position; to: ' + pos.x + ' 0 ' + pos.z +'; dur: 800' );
+                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
+                    else if (el.id == "key") locked = false;
+                    else if (el.id == "hammer") tool = true;
+                    setTimeout(function () { el.remove(); }, 3000);
                 });
             }
         });
-
-        // Βροχή
-        AFRAME.registerComponent('rain-drop', {
-
-            tick: function () {
-
-                if (!rain) return;
-
-                var pos = this.el.getAttribute('position');
-
-                pos.y -= 0.3;
-
-                // Αν ακουμπήσει κάτω
-                if (pos.y < 0) {
-
-                    // Ξανανεβαίνει
-                    pos.y = 8;
-
-                    // Νέα random θέση
-                    pos.x = Math.random() * 40 - 20;
-                    pos.z = Math.random() * 40 - 20;
-                }
-
-                this.el.setAttribute('position', pos);
-            }
-        });
-
     </script>
-
 </head>
 
-<body>
-
-    <a-scene id="s1" background="color: #22252a">
-
-        <!-- Walls -->
-
-        <a-plane static-body
-                 width="40"
-                 height="8"
-                 position="-20 4 0"
-                 rotation="0 90 0">
-
-            <!-- Window -->
-
-            <a-box id="window"
-                   color="silver"
-                   opacity="0.5"
-                   scale="1.25 1.25 0.5"
-                   position="-15 2 -0.2"
-                   sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)"
-                   focusing>
-
-                <a-light distance="1"
-                         type="spot"
-                         position="0 0 1">
-                </a-light>
-
-                <a-light angle="90"
-                         intensity="0.01"
-                         type="spot"
-                         position="0 0 -1"
-                         rotation="180 0 0">
-                </a-light>
-
-            </a-box>
-
-        </a-plane>
-
-        <a-plane static-body
-                 width="40"
-                 height="8"
-                 position="20 4 0"
-                 rotation="0 -90 0">
-        </a-plane>
-
-        <a-plane static-body
-                 width="40"
-                 height="8"
-                 position="0 4 20"
-                 material="side:back">
-        </a-plane>
-
-        <a-plane static-body
-                 width="40"
-                 height="8"
-                 position="0 4 -20">
-        </a-plane>
-
-        <!-- Floor -->
-
-        <a-plane static-body
-                 width="40"
-                 height="40"
-                 position="0 0 0"
-                 rotation="-90 0 0">
-        </a-plane>
-
-        <!-- Ceiling -->
-
-        <a-plane static-body
-                 width="40"
-                 height="40"
-                 position="0 8 0"
-                 rotation="90 0 0">
-        </a-plane>
-
-        <!-- Door -->
-
-        <a-plane id="door"
-                 height="4"
-                 width="2"
-                 color="darkgreen"
-                 position="0 2 -19.9"
-                 sound="src: url(mixkit-locking-a-shop-door-with-keys-202.wav)"
-                 focusing>
-
-            <a-ring color="black"
-                    radius-inner="0.01"
-                    radius-outer="0.1"
-                    position="0.75 0 0.01">
-            </a-ring>
-
-        </a-plane>
-
-        <!-- Player -->
-
-        <a-entity id="rig">
-
-            <a-camera id="cam">
-
-                <a-text value=""
-                        align="center"
-                        geometry="primitive: plane; width: 0; height: 1"
-                        position="0 0.5 -1"
-                        material="opacity: 0"
-                        updating>
-                </a-text>
-
-                <a-cone static-body
-                        height="2"
-                        position="0 -1 0">
-                </a-cone>
-
-                <a-cursor color="yellow"
-                          fuse="true"
-                          far="10">
-                </a-cursor>
-
-                <a-light id="light"
-                         distance="20"
-                         intensity="0.25"
-                         type="spot"
-                         penumbra="0.5"
-                         visible="false">
-                </a-light>
-
-            </a-camera>
-
-            <a-entity oculus-touch-controls="hand: right"
-                      oculus-thumbstick-controls>
-            </a-entity>
-
-        </a-entity>
-
-    </a-scene>
-
-    <script>
-
-        var scene1 = document.getElementById('s1');
-
-        // Αρχική βροχή (250 σταγόνες)
-
-        for (var i = 0; i < 250; i++) {
-
-            var drop = document.createElement('a-cylinder');
-
-            drop.setAttribute('class', 'drop');
-
-            drop.setAttribute('color', '#A0C4DE');
-
-            drop.setAttribute('radius', '0.015');
-
-            drop.setAttribute('height', '0.4');
-
-            drop.setAttribute('opacity', '0.6');
-
-            // Random θέση
-            var x = Math.random() * 40 - 20;
-            var y = Math.random() * 8;
-            var z = Math.random() * 40 - 20;
-
-            drop.setAttribute(
-                'position',
-                x + ' ' + y + ' ' + z
-            );
-
-            // Movement component
-            drop.setAttribute('rain-drop', '');
-
-            // Προσθήκη στη σκηνή
-            scene1.appendChild(drop);
-        }
-
-        // Κάθε 10 δευτερόλεπτα αυξάνει η βροχή
-
-        setInterval(function () {
-
-            // Αν σταμάτησε η βροχή
-            if (!rain) return;
-
-            // Προσθέτει 20 νέες σταγόνες
-            for (var i = 0; i < 20; i++) {
-
-                var drop = document.createElement('a-cylinder');
-
-                drop.setAttribute('class', 'drop');
-
-                drop.setAttribute('color', '#A0C4DE');
-
-                drop.setAttribute('radius', '0.015');
-
-                drop.setAttribute('height', '0.4');
-
-                drop.setAttribute('opacity', '0.6');
-
-                // Random θέση
-                var x = Math.random() * 40 - 20;
-                var y = Math.random() * 8;
-                var z = Math.random() * 40 - 20;
-
-                drop.setAttribute(
-                    'position',
-                    x + ' ' + y + ' ' + z
-                );
-
-                // Rain movement
-                drop.setAttribute('rain-drop', '');
-
-                // Add στη σκηνή
-                scene1.appendChild(drop);
-            }
-
-        }, 10000);
-
-    </script>
-
 </body>
-
+    <a-scene id="s1" background="color: #220000" fog="type: linear; color: #330000; near: 1; far: 25">
+     <a-plane static-body width="30" height="7" position="-21 4 0" rotation="0 90 0">
+     <a-box id="window" color="silver" opacity="0.8" scale="3.25 3.25 1.5" position="3 2 -0.2"
+         sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)" focusing>
+                <a-light distance="1" type="spot" position="0 0 1"></a-light>
+                <a-light angle="90" intensity="0.01" type="spot" position="0 0 -1" rotation="180 0 0"></a-light>
+            </a-box>
+        </a-plane>
+        <a-plane static-body width="40" height="8" position="20 4 0" rotation="0 -90 0"></a-plane>
+        <a-plane static-body width="40" height="8" position="0 4 21" material="side:back"></a-plane>
+        <a-plane static-body width="40" height="8" position="0 4 -21"></a-plane>
+        <a-plane static-body width="40" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
+        <a-plane static-body width="40" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
+        <a-plane id="door" height="4" width="2" color="red" position="0 2 -15.9"
+            sound="src: url(mixkit-locking-a-shop-door-with-keys-202.wav)" focusing>
+            <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
+        </a-plane>
+        </a-scene>
 </html>
