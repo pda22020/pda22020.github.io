@@ -7,7 +7,7 @@
         var locked = true, tool = false, gas = true, message = "", time = 5000, coords;
 
         AFRAME.registerComponent('updating', {
-            init: function () {
+            init: function (
                 coords = document.getElementById('cam');
                 document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
                 document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam'); });
