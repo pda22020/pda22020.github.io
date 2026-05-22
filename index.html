@@ -1,118 +1,214 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Poopy-Shooty VR</title>
-  <script src="https://aframe.io"></script>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://c-frame.github.io/aframe-physics-system/dist/aframe-physics-system.min.js"></script>
+    <script src="https://gftruj.github.io/webzamples/aframe/controls/oculus-thumbstick-controls.js"></script>
+    <script>
+        var locked = true, tool = false, rain = true, message = "", time = 5000, coords;
+        
+        AFRAME.registerComponent('updating', {
+            init: function () {
+                coords = document.getElementById('cam');
+                document.querySelector('a-scene').addEventListener('enter-vr', function () { coords = document.getElementById('rig'); });
+                document.querySelector('a-scene').addEventListener('exit-vr', function () { coords = document.getElementById('cam'); });
+            },
+            tick: function () {
+                if (rain) time--;
+                if (time < 0) message = "Game over...";
+                if (message != "") this.el.setAttribute('value', message);
+                else this.el.setAttribute('value', '' + Math.round(time / 100));
+
+                var pos = coords.getAttribute('position');
+                if (pos.x < -19) pos.x = -19;
+                if (pos.x > 19) pos.x = 19;
+                if (pos.z < -19) pos.z = -19;
+                if (pos.z > 19) pos.z = 19;
+                coords.setAttribute('position', pos);
+            }
+        });
+
+        AFRAME.registerComponent('focusing', {
+            init: function () {
+                var el = this.el;
+                el.addEventListener('mouseenter', function () {
+                    var pos = coords.getAttribute('position');
+                    if (el.id == "door") {
+                        if (!locked && time >= 0) {
+                            el.components.sound.playSound();
+                            message = "Well done!";
+                        }
+                        return;
+                    }
+                    else if (el.id == "window") {
+                        if (tool) {
+                            // Σταματάει η βροχή και εξαφανίζονται οι σταγόνες
+                            rain = false;
+                            var drops = document.querySelectorAll('.drop');
+                            drops.forEach(function(drop) { drop.remove(); });
+                            
+                            el.components.sound.playSound();
+                            el.setAttribute('blending', 'subtractive');
+                        }
+                        return;
+                    }
+                    el.removeAttribute('dynamic-body');
+                    el.setAttribute('animation', 'property: position; to: ' + pos.x + ' 0 ' + pos.z);
+
+                    if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
+                    else if (el.id == "key") locked = false;
+                    else if (el.id == "hammer") tool = true;
+                    setTimeout(function () { el.remove(); }, 3000);
+                });
+            }
+        });
+
+        // Component για την κίνηση της κάθε σταγόνας
+        AFRAME.registerComponent('rain-drop', {
+            tick: function () {
+                if (!rain) return;
+                var pos = this.el.getAttribute('position');
+                pos.y -= 0.3; // Ταχύτητα πτώσης
+                if (pos.y < 0) { 
+                    // Αν ακουμπήσει το έδαφος, ξαναρχίζει από ψηλά σε τυχαία θέση
+                    pos.y = 8;
+                    pos.x = Math.random() * 40 - 20;
+                    pos.z = Math.random() * 40 - 20;
+                }
+                this.el.setAttribute('position', pos);
+            }
+        });
+    </script>
 </head>
-<body style="margin: 0; overflow: hidden;">
-<script>
- let score = 0;
+<body>
+    <a-scene id="s1" background="color: #22252a">
+        <a-plane static-body width="40" height="8" position="-20 4 0" rotation="0 90 0">
+            <a-box id="window" color="silver" opacity="0.5" scale="1.25 1.25 0.5" position="-15 2 -0.2"
+                sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)" focusing>
+                <a-light distance="1" type="spot" position="0 0 1"></a-light>
+                <a-light angle="90" intensity="0.01" type="spot" position="0 0 -1" rotation="180 0 0"></a-light>
+            </a-box>
+        </a-plane>
+        <a-plane static-body width="40" height="8" position="20 4 0" rotation="0 -90 0"></a-plane>
+        <a-plane static-body width="40" height="8" position="0 4 20" material="side:back"></a-plane>
+        <a-plane static-body width="40" height="8" position="0 4 -20"></a-plane>
+        <a-plane static-body width="40" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
+        <a-plane static-body width="40" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
+        
+        <a-plane id="door" height="4" width="2" color="darkgreen" position="0 2 -19.9"
+            sound="src: url(mixkit-locking-a-shop-door-with-keys-202.wav)" focusing>
+            <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
+        </a-plane>
 
- // Έλεγχος για το Space (Πληκτρολόγιο)
- document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space') shoot(document.querySelector('a-camera'));
-});
+        <a-entity id="rig">
+            <a-camera id="cam">
+                <a-text value="" align="center" geometry="primitive: plane; width: 0; height: 1" position="0 0.5 -1"
+                    material="opacity: 0" updating></a-text>
+                <a-cone static-body height="2" position="0 -1 0"></a-cone>
+                <a-cursor color="yellow" fuse="true" far="10"></a-cursor>
+                <a-light id="light" distance="20" intensity="0.25" type="spot" penumbra="0.5" visible="false"></a-light>
+            </a-camera>
+            <a-entity oculus-touch-controls="hand: right" oculus-thumbstick-controls></a-entity>
+        </a-entity>
 
- // Η συνάρτηση βολής δέχεται πλέον το "source" (κάμερα ή controller)
- function shoot(sourceEl) {
-  let bullet = document.createElement('a-sphere');
-  bullet.setAttribute('radius', '0.15');
-  bullet.setAttribute('color', 'yellow');
-  
-  let pos = sourceEl.object3D.position.clone();
-  let dir = new THREE.Vector3(0, 0, -1);
-  
-  // Υπολογισμός κατεύθυνσης βάσει του rotation της κάμερας ή του controller
-  dir.applyQuaternion(sourceEl.object3D.quaternion);
-  
-  bullet.setAttribute('position', pos);
-  bullet.dataset.dx = dir.x;
-  bullet.dataset.dy = dir.y;
-  bullet.dataset.dz = dir.z;
-  bullet.setAttribute('class', 'bullet');
-  bullet.setAttribute('bullet-move', ''); // Ενεργοποίηση κίνησης αμέσως
-  document.querySelector('a-scene').appendChild(bullet);
-  setTimeout(() => { if(bullet.parentNode) bullet.remove(); }, 2500);
-}
+        <a-cylinder dynamic-body id="hammer" color="tan" height="0.5" radius="0.05" focusing>
+            <a-box color="black" width="0.5" height="0.1" depth="0.1" position="0 0.25 0"></a-box>
+        </a-cylinder>
+        <a-cylinder dynamic-body id="key" color="silver" height="0.15" radius="0.01" focusing>
+            <a-box color="silver" scale="0.04 0.03 0.02" position="0.02 0.04 0"></a-box>
+            <a-torus color="silver" radius="0.03" radius-tubular="0.003" position="0 -0.1 0"></a-torus>
+        </a-cylinder>
+        <a-cylinder dynamic-body id="torch" height="0.5" radius="0.1" rotation="90 0 0" focusing>
+            <a-cone height="0.2" radius-top="0.1" radius-bottom="0.2" position="0 0.2 0" rotation="180 0 0"></a-cone>
+            <a-light distance="20" intensity="0.25" type="spot" penumbra="0.5" position="0 0.2 0"
+                rotation="90 0 0"></a-light>
+            <a-light distance="0.3" type="spot" position="0 0.4 0" rotation="-90 0 0"></a-light>
+        </a-cylinder>
 
-AFRAME.registerComponent('bullet-move', {
-  tick: function () {
-    let el = this.el;
-    let pos = el.object3D.position;
-    pos.x += parseFloat(el.dataset.dx) * 0.8;
-    pos.y += parseFloat(el.dataset.dy) * 0.8;
-    pos.z += parseFloat(el.dataset.dz) * 0.8;
-    document.querySelectorAll('.enemy').forEach(enemy => {
-      let ep = enemy.object3D.position;
-      if (pos.distanceTo(ep) < 1.5) {
-        if(enemy.parentNode) enemy.remove();
-        if(el.parentNode) el.remove();
-        score++;
-        document.querySelector('#score').setAttribute('value', 'Score: ' + score);
-      }
-    });
-  }
-});
+        <a-box dynamic-body id="table" color="brown" scale="3 0.2 3" position="-10 2 -10">
+            <a-cylinder height="6" radius="0.03" position="-0.4 -3 -0.4"></a-cylinder>
+            <a-cylinder height="6" radius="0.03" position="-0.4 -3 0.4"></a-cylinder>
+            <a-cylinder height="6" radius="0.03" position="0.4 -3 -0.4"></a-cylinder>
+            <a-cylinder height="6" radius="0.03" position="0.4 -3 0.4"></a-cylinder>
+        </a-box>
 
-AFRAME.registerComponent('enemy-ai', {
-  tick: function () {
-    let player = document.querySelector('a-camera');
-    let playerPos = player.object3D.position;
-    let enemyPos = this.el.object3D.position;
-    let dir = new THREE.Vector3().subVectors(playerPos, enemyPos).normalize();
-    let speed = 0.15; 
-    enemyPos.x += dir.x * speed;
-    enemyPos.y += dir.y * speed;
-    enemyPos.z += dir.z * speed;
-    let dist = enemyPos.distanceTo(playerPos);
-    if (dist < 2.5) {
-      alert("Game Over! Τελικό Σκορ: " + score);
-      location.reload();
-    }
-  }
-});
+        <a-box dynamic-body id="chair" color="brown" scale="1 0.1 1" position="10 1.5 10">
+            <a-cylinder height="8" radius="0.05" position="-0.4 -4 -0.4"></a-cylinder>
+            <a-cylinder height="8" radius="0.05" position="-0.4 -4 0.4"></a-cylinder>
+            <a-cylinder height="19" radius="0.05" position="0.4 2 -0.4"></a-cylinder>
+            <a-cylinder height="19" radius="0.05" position="0.4 2 0.4"></a-cylinder>
+            <a-box color="silver" scale="0.05 5 1" position="0.4 8 0"></a-box>
+        </a-box>
 
-// Component για να ακούει τα VR Controllers
-AFRAME.registerComponent('vr-shoot', {
-  init: function () {
-    this.el.addEventListener('triggerdown', () => {
-      shoot(this.el); // Πυροβολεί από το controller
-    });
-  }
-});
+        <a-cylinder static-body id="ladder" color="silver" height="5" radius="0.1" position="-19 2.5 14.5"
+            rotation="20 -90 0">
+            <a-cylinder color="silver" height="5" radius="0.1" position="1 0 0"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 2 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 1.5 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 1 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 0.5 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 0 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 -0.5 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 -1 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 -1.5 0" rotation="0 0 90"></a-cylinder>
+            <a-cylinder color="silver" height="1" radius="0.05" position="0.5 -2 0" rotation="0 0 90"></a-cylinder>
+        </a-cylinder>
+    </a-scene>
 
-setInterval(() => {
-  let enemy = document.createElement('a-sphere');
-  enemy.setAttribute('class', 'enemy');
-  enemy.setAttribute('radius', '1');
-  enemy.setAttribute('color', '#5C4033');
-  let x = Math.random() * 30 - 15;
-  let y = Math.random() * 5 + 1;
-  enemy.setAttribute('position', `${x} ${y} -40`);
-  enemy.setAttribute('enemy-ai', '');
-  document.querySelector('a-scene').appendChild(enemy);
-}, 1500);
+    <script>
+        var scene1 = document.getElementById('s1');
 
-</script>
+        // ΔΗΜΙΟΥΡΓΙΑ ΒΡΟΧΗΣ (250 σταγόνες)
+        for (var i = 0; i < 250; i++) {
+            var drop = document.createElement('a-cylinder');
+            drop.setAttribute('class', 'drop');
+            drop.setAttribute('color', '#A0C4DE');
+            drop.setAttribute('radius', '0.015');
+            drop.setAttribute('height', '0.4'); // Λεπτές και μακριές σταγόνες
+            drop.setAttribute('opacity', '0.6');
+            
+            // Τυχαία αρχική τοποθέτηση στον χώρο
+            var x = Math.random() * 40 - 20;
+            var y = Math.random() * 8;
+            var z = Math.random() * 40 - 20;
+            drop.setAttribute('position', x + ' ' + y + ' ' + z);
+            
+            // Προσθήκη του component κίνησης
+            drop.setAttribute('rain-drop', '');
+            scene1.appendChild(drop);
+        }
 
-<a-scene>
-  <!-- Ο αρχικός σου κόκκινος κόσμος -->
-  <a-box position="0 10 0" width="40" height="20" depth="80" color="#ff0000" material="side: double"></a-box>
-  
-  <a-camera wasd-controls look-controls>
-    <a-cursor color="yellow"></a-cursor>
-    <a-text id="score" 
-            value="Score: 0" 
-            position="-0.8 0.5 -1" 
-            scale="0.4 0.4 0.4"
-            color="white"></a-text>
-  </a-camera>
+        // Τα υπόλοιπα αντικείμενα του παιχνιδιού σου
+        for (var i = 0; i < 200; i++) {
+            var box = document.createElement('a-box');
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            box.setAttribute('dynamic-body', '');
+            box.setAttribute('color', 'tan');
+            box.setAttribute('scale', (Math.random() + 0.25) + ' ' + (Math.random() + 0.25) + ' ' + (Math.random() + 0.25));
+            box.setAttribute('position', x + ' 7 ' + z);
+            scene1.appendChild(box);
+        }
 
-  <!-- Προσθήκη Controllers για VR -->
-  
-  
-</a-scene>
+        for (var i = 0; i < 10; i++) {
+            var t = document.getElementById('table').cloneNode(true);
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            t.setAttribute('position', x + ' 2 ' + z);
+            t.setAttribute('rotation', '0 ' + Math.random() * 90 + ' 0');
+            scene1.appendChild(t);
+        }
 
+        for (var i = 0; i < 20; i++) {
+            var c = document.getElementById('chair').cloneNode(true);
+            var x = Math.random() * 40 - 20;
+            var z = Math.random() * 40 - 20;
+            c.setAttribute('position', x + ' 6 ' + z);
+            scene1.appendChild(c);
+        }
+
+        document.getElementById('hammer').setAttribute('position', (Math.random() * 30 - 15) + ' 5 ' + (Math.random() * 30 - 15));
+        document.getElementById('torch').setAttribute('position', (Math.random() * 30 - 15) + ' 3 ' + (Math.random() * 30 - 15));
+        document.getElementById('key').setAttribute('position', (Math.random() * 30 - 15) + ' 1 ' + (Math.random() * 30 - 15));
+    </script>
 </body>
 </html>
