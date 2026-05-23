@@ -127,6 +127,47 @@
         </a-cylinder>
     </a-scene>
     <script>
+
+    for (let i = 0; i < 30; i++) {
+
+    // Δημιουργία λουλουδιού
+    let flower = document.createElement("a-entity");
+
+    // Τυχαία θέση
+    let x = (Math.random() * 20) - 10;
+    let z = (Math.random() * 20) - 10;
+
+    flower.setAttribute("position", `${x} 0 ${z}`);
+
+    // Κοτσάνι
+    let stem = document.createElement("a-cylinder");
+    stem.setAttribute("color", "green");
+    stem.setAttribute("radius", "0.02");
+    stem.setAttribute("height", "0.5");
+    stem.setAttribute("position", "0 0.25 0");
+
+    // Κέντρο
+    let center = document.createElement("a-sphere");
+    center.setAttribute("color", "yellow");
+    center.setAttribute("radius", "0.05");
+    center.setAttribute("position", "0 0.55 0");
+
+    // Πέταλο
+    let petal1 = document.createElement("a-sphere");
+    petal1.setAttribute("color", "pink");
+    petal1.setAttribute("radius", "0.04");
+    petal1.setAttribute("position", "0.08 0.55 0");
+
+    // Προσθήκη parts
+    flower.appendChild(stem);
+    flower.appendChild(center);
+    flower.appendChild(petal1);
+
+    // Προσθήκη στο scene
+    document.querySelector("a-scene").appendChild(flower);
+}
+
+</script>
          var scene1 = document.getElementById('s1');
         for (var i = 0; i < 200; i++) {
             var box = document.createElement('a-box');
