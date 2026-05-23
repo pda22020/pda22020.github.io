@@ -50,7 +50,6 @@
 
 </body>
     <a-scene id="s1" background="color: #220000" fog="type: linear; color: #330000; near: 0.5; far: 21">
-     <a-plane static-body width="60" height="7" position="-20 4 0" rotation="0 90 0">
          sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)" focusing>
                 <a-light distance="1" type="spot" position="0 0 1"></a-light>
                 <a-light angle="90" intensity="0.01" type="spot" position="0 0 -1" rotation="180 0 0"></a-light>
@@ -115,8 +114,8 @@
     </a-scene>
     
     <script>
-// ΒΡΟΧΗ
-for (let i = 0; i < 300; i++) {
+    var scene1 = document.getElementById('s1');
+    for (let i = 0; i < 300; i++) {
 
     let rain = document.createElement("a-cylinder");
 
@@ -209,6 +208,6 @@ for (let i = 0; i < 300; i++) {
         document.getElementById('torch').setAttribute('position', (Math.random() * 30 - 15) + ' 3 ' + (Math.random() * 30 - 15));
         document.getElementById('key').setAttribute('position', (Math.random() * 30 - 15) + ' 1 ' + (Math.random() * 30 - 15));
     </script>
-</body>
 </a-scene>
+</body>
 </html>
