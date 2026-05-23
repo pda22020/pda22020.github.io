@@ -35,22 +35,12 @@
                             message = "Well done!";
                         }
                         return;
-                    }
-           else if (el.id == "window") {
-                        if (tool) {
-                            document.querySelector('a-scene').removeAttribute('animation');
-                            document.querySelector('a-scene').setAttribute('animation', 'property: rain.far; to: 1000; dur: 50000');
-                            rain = false;
-                            el.components.sound.playSound();
-                            el.setAttribute('blending', 'subtractive');
-                        }
-                        return;
                     }          
                 el.removeAttribute('dynamic-body');
                el.setAttribute('animation',  'property: position; to: ' + pos.x + ' 0 ' + pos.z +'; dur: 800' );
                     if (el.id == "torch") document.getElementById('light').setAttribute('animation', 'property: visible; to: true');
                     else if (el.id == "key") locked = false;
-                    else if (el.id == "hammer") tool = true;
+                    else if (el.id == "knife") tool = true;
                     setTimeout(function () { el.remove(); }, 3000);
                 });
             }
@@ -58,10 +48,9 @@
     </script>
 </head>
 
-</body>
+<body>
     <a-scene id="s1" background="color: #220000" fog="type: linear; color: #330000; near: 0.5; far: 21">
-     <a-plane static-body width="30" height="7" position="-21 4 0" rotation="0 90 0">
-     <a-box id="window" color="silver" opacity="0.8" scale="1.25 1.25 1.5" position="3 2 -0.2"
+     <a-plane static-body width="60" height="7" position="-20 4 0" rotation="0 90 0">
          sound="src: url(mixkit-glass-break-with-hammer-thud-759.wav)" focusing>
                 <a-light distance="1" type="spot" position="0 0 1"></a-light>
                 <a-light angle="90" intensity="0.01" type="spot" position="0 0 -1" rotation="180 0 0"></a-light>
@@ -112,8 +101,6 @@
             <a-cylinder height="19" radius="0.05" position="0.4 2 0.4"></a-cylinder>
             <a-box color="silver" scale="0.05 5 1" position="0.4 8 0"></a-box>
         </a-box>
-        <a-cylinder static-body id="ladder" color="white" height="5" radius="0.1" position="-19 2.5 14.5"
-            rotation="20 -90 0">
             <a-cylinder color="silver" height="5" radius="0.1" position="1 0 0"></a-cylinder>
             <a-cylinder color="silver" height="1" radius="0.05" position="0.5 2 0" rotation="0 0 90"></a-cylinder>
             <a-cylinder color="silver" height="1" radius="0.05" position="0.5 1.5 0" rotation="0 0 90"></a-cylinder>
@@ -126,16 +113,41 @@
             <a-cylinder color="silver" height="1" radius="0.05" position="0.5 -2 0" rotation="0 0 90"></a-cylinder>
         </a-cylinder>
     </a-scene>
+    
     <script>
+// ΒΡΟΧΗ
+for (let i = 0; i < 300; i++) {
 
+    let rain = document.createElement("a-cylinder");
+
+    let x = Math.random() * 40 - 20;
+    let y = Math.random() * 20 + 5;
+    let z = Math.random() * 40 - 20;
+
+    rain.setAttribute("position", `${x} ${y} ${z}`);
+
+    rain.setAttribute("radius", "0.01");
+    rain.setAttribute("height", "0.3");
+    rain.setAttribute("color", "#88ccff");
+
+    rain.setAttribute(
+        "animation",
+        `property: position;
+         to: ${x} -2 ${z};
+         dur: ${1000 + Math.random()*2000};
+         loop: true`
+    );
+
+    scene1.appendChild(rain);
+}
     for (let i = 0; i < 60; i++) {
 
     // Δημιουργία λουλουδιού
     let flower = document.createElement("a-entity");
 
     // Τυχαία θέση
-    let x = (Math.random() * 20) - 10;
-    let z = (Math.random() * 20) - 10;
+    let x = (Math.random() * 60) - 10;
+    let z = (Math.random() * 60) - 10;
 
     flower.setAttribute("position", `${x} 0 ${z}`);
 
@@ -143,7 +155,7 @@
     let stem = document.createElement("a-cylinder");
     stem.setAttribute("color", "green");
     stem.setAttribute("radius", "0.02");
-    stem.setAttribute("height", "0.5");
+    stem.setAttribute("height", "0.2");
     stem.setAttribute("position", "0 0.25 0");
 
     // Κέντρο
@@ -193,13 +205,10 @@
             c.setAttribute('position', x + ' 6 ' + z);
             scene1.appendChild(c);
         }
-        document.getElementById('hammer').setAttribute('position', (Math.random() * 30 - 15) + ' 5 ' + (Math.random() * 30 - 15));
+        document.getElementById('knife').setAttribute('position', (Math.random() * 30 - 15) + ' 5 ' + (Math.random() * 30 - 15));
         document.getElementById('torch').setAttribute('position', (Math.random() * 30 - 15) + ' 3 ' + (Math.random() * 30 - 15));
         document.getElementById('key').setAttribute('position', (Math.random() * 30 - 15) + ' 1 ' + (Math.random() * 30 - 15));
     </script>
 </body>
-
-</html>
-
-    </a-scene>
+</a-scene>
 </html>
