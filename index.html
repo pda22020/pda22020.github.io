@@ -18,9 +18,9 @@
                 else this.el.setAttribute('value', '' + Math.round(time / 100));
              var pos = coords.getAttribute('position');
                 if (pos.x < -21) pos.x = -21;
-                if (pos.x > 20) pos.x = 20;
+                if (pos.x > 21) pos.x = 21;
                 if (pos.z < -21) pos.z = -21;
-                if (pos.z > 20) pos.z = 20;
+                if (pos.z > 21) pos.z = 21;
                 coords.setAttribute('position', pos);
             }
         });
@@ -60,7 +60,7 @@
         <a-plane static-body width="60" height="8" position="0 4 -21"></a-plane>
         <a-plane static-body width="60" height="40" position="0 0 0" rotation="-90 0 0"></a-plane>
         <a-plane static-body width="60" height="40" position="0 8 0" rotation="90 0 0"></a-plane>
-        <a-plane id="door" height="4" width="2" color="red" position="0 2 -20.5"
+        <a-plane id="door" height="4" width="2" color="red" position="0 2 -20.8"
             sound="src: url(mixkit-locking-a-shop-door-with-keys-202.wav)" focusing>
             <a-ring color="black" radius-inner="0.01" radius-outer="0.1" position="0.75 0 0.01"></a-ring>
         </a-plane>
