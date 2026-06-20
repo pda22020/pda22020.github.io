@@ -3,12 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand View Hotel</title>
 
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <script>
+        /*
+            MAP:
+            scene1 -> NORTH -> scene2
+            scene2 -> EAST  -> scene3
+            scene3 -> EAST  -> scene4
+            scene4 -> EAST  -> scene5
+            scene5 -> EAST  -> scene6
+        */
         const MAP = [
             [0, 2, 0, 0, 0],
             [0, 1, 3, 4, 5],
@@ -20,11 +27,11 @@
         const TEXT = [
             'You got a call late at night that a serial killer is in a hotel.\nYou are standing in front of the Grand View Hotel.\nLook forward and use the NORTH arrow to enter the hotel.',
 
-            'A girl is waiting in the lobby, shaking with fear:\n"Thank god you are finally here!"\nShe is holding a room key-card.\nClick on the key-card to take it, then look right and use the EAST arrow.',
+            'A girl is waiting in the lobby of the hotel, shaking with fear:\n"Thank god you are finally here!"\nLook to the right and use the EAST arrow to go upstairs to the hallway.',
 
-            'Now you are upstairs investigating.\nIn the hallway you see an open door.\nClick on the door to use the key-card, then use the EAST arrow to enter.',
+            'Now you are upstairs investigating.\nIn the middle of the hallway you see an open door.\nUse the EAST arrow to enter the room.',
 
-            'You walk inside the room.\nA frightening man is sitting on the bed, watching TV.\nUse the EAST arrow to continue.',
+            'You walk inside the room.\nA frightening man is sitting on the bed in a dirty room, watching TV...\nUse the EAST arrow to continue.',
 
             '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\nThat is all they see now...\nMaybe I should stop fighting it.\nUse the EAST arrow to continue.',
 
@@ -36,12 +43,7 @@
 </head>
 
 <body>
-    <a-scene
-        vr-mode-ui="enabled: true"
-        device-orientation-permission-ui="enabled: true"
-        cursor="rayOrigin: mouse"
-        raycaster="objects: .interactive"
-        game-logic>
+    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
 
         <a-assets>
             <img id="sky1" src="scene1.png">
@@ -57,7 +59,7 @@
         <a-camera wasd-controls="enabled:false">
 
             <a-plane color="#000"
-                     height="0.45"
+                     height="0.42"
                      width="2"
                      opacity="0.55"
                      position="0 -0.62 -1">
@@ -109,27 +111,8 @@
         </a-camera>
 
         <a-entity id="scene1" class="scene"></a-entity>
-
-        <a-entity id="scene2" class="scene" visible="false">
-            <a-box class="interactive"
-                   position="0 1.2 -3"
-                   scale="0.35 0.05 0.22"
-                   color="gold"
-                   pick="a room key-card">
-            </a-box>
-        </a-entity>
-
-        <a-entity id="scene3" class="scene" visible="false">
-            <a-box class="interactive"
-                   position="0 1.5 -3"
-                   scale="0.8 1.4 0.1"
-                   color="#222"
-                   drop="a room key-card"
-                   goal="You use the room key-card.\nThe door unlocks with a click.\nNow use the EAST arrow to enter the room."
-                   fail="The door is locked.\nYou need the room key-card from the lobby.">
-            </a-box>
-        </a-entity>
-
+        <a-entity id="scene2" class="scene" visible="false"></a-entity>
+        <a-entity id="scene3" class="scene" visible="false"></a-entity>
         <a-entity id="scene4" class="scene" visible="false"></a-entity>
         <a-entity id="scene5" class="scene" visible="false"></a-entity>
         <a-entity id="scene6" class="scene" visible="false"></a-entity>
