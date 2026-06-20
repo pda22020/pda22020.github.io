@@ -1,35 +1,57 @@
-α<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <title>Grand View Hotel</title>
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
     <script>
-        // NAVIGATION: define the place of each scene on the graph
-        const MAP = [
-            [0, 5, 6],
-            [2, 1, 0],
-            [0, 3, 4]
-        ];
+        AFRAME.registerComponent('game-logic', {
+            init: function () {
+                let sceneNumber = 1;
 
-        // INVENTORY: add any items available when the game starts
-        let ITEMS = ['a watch'];
+                const TEXT = [
+                    'You got a call late at night that a serial killer is in a hotel.\nYou are standing in front of the hotel.',
+                    'A girl is waiting in the lobby of the hotel, shaking with fear:\n"Thank god you are finally here!"',
+                    'Now you are upstairs investigating.\nIn the middle of the hallway you see an open door.',
+                    'You walk inside the room.\nA frightening man is sitting on the bed in a dirty room, watching TV...',
+                    '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\n"That is all they see now... Maybe I should stop fighting it."',
+                    'I was ready to pull out my gun, but I underestimated how fast he was despite his enormous figure.\nHe grabbed me by the collar and that was the last thing I saw.'
+                ];
 
-        // MAIN INFO: enter the scenes welcome text (ascending order)
-        const TEXT = [
-            'You got a call late at night that a serial killer is in a hotel.\nYou are standing in front of the hotel',
-            'A girl is waiting in the lobby of the hotel shaking with fear :\n"Thank god you are finally here!"',
-            'Now you are upstairs investigating.\nA In the middle of the hallway you see an open door.',
-            'You walk inside the room.\n A frightening man is sitting on the bed in a dirty room, watching TV ...',
-            '"You know what hurts me the most? .\n Nobody asked if it was true.\nThey saw a face on the news and that was enough." \n "Killer." \n "Monster." \n "Psycho" \n Thays all they see now...Maybe I should stop fighting it.',
-            'I was ready to pull out my gun but I underestimated how fast he was despite his enormouse figure.\nHe grabbed me by the colar and that was the last thing I saw'
-        ];
+                const sky = document.querySelector('#sky');
+                const info = document.querySelector('#info');
+                const next = document.querySelector('#next');
+
+                function showScene(number) {
+                    sky.setAttribute('src', '#sky' + number);
+                    info.setAttribute('value', TEXT[number - 1]);
+
+                    if (number === 6) {
+                        next.setAttribute('visible', false);
+                    } else {
+                        next.setAttribute('visible', true);
+                    }
+                }
+
+                next.addEventListener('click', function () {
+                    if (sceneNumber < 6) {
+                        sceneNumber++;
+                        showScene(sceneNumber);
+                    }
+                });
+
+                showScene(sceneNumber);
+            }
+        });
     </script>
-    <script src="game-logic.js"></script>
 </head>
 
 <body>
     <a-scene cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
 
-        <!-- SKY IMAGES -->
         <a-assets>
             <img id="sky1" src="scene1.png">
             <img id="sky2" src="scene2.png">
@@ -38,62 +60,38 @@
             <img id="sky5" src="scene5.png">
             <img id="sky6" src="scene6.png">
         </a-assets>
-        <a-sky id="sky" rotation="0 -90 0"></a-sky>
 
-        <!-- CAMERA & STORYBOARD -->
+        <a-sky id="sky" src="#sky1" rotation="0 -90 0"></a-sky>
+
         <a-camera wasd-controls="enabled:false">
-            <a-plane color="#000" height="0.3" opacity="0.25" position="0 -0.6 -1">
-                <a-text id="info" width="1" value="" font="monoid" align="center"></a-text>
-                <a-cone id="east" scale="0.05 0.05 0.05" position="0.55 0 0" rotation="0 -30 -88"></a-cone>
-                <a-cone id="west" scale="0.05 0.05 0.05" position="-0.55 0 0" rotation="0 30 88"></a-cone>
-                <a-cone id="north" scale="0.05 0.05 0.05" position="0 0.2 0" rotation="-20 0 0"></a-cone>
-                <a-cone id="south" scale="0.05 0.05 0.05" position="0 -0.2 0" rotation="-40 0 180"></a-cone>
+
+            <a-plane color="#000"
+                     height="0.35"
+                     width="1.8"
+                     opacity="0.45"
+                     position="0 -0.65 -1">
+
+                <a-text id="info"
+                        value=""
+                        width="1.6"
+                        align="center"
+                        font="monoid"
+                        color="white"
+                        position="0 0 0.01">
+                </a-text>
+
+                <a-cone id="next"
+                        class="interactive"
+                        color="white"
+                        scale="0.06 0.06 0.06"
+                        position="0.78 0 0.02"
+                        rotation="0 -30 -88">
+                </a-cone>
+
             </a-plane>
+
             <a-cursor fuse="true"></a-cursor>
         </a-camera>
-
-        <!-- 1st SCENE -->
-        <a-entity id="scene1" class="scene"></a-entity>
-
-        <!-- 2nd SCENE -->
-        <a-entity id="scene2" class="scene" visible="false">
-            <a-cylinder class="interactive" position="-3 1 -4" scale="0.5 2 0.5" visible="false" drop="a watch"
-                pick="some money" goal='"Nice stuff,\nI will pay for it!"'
-                fail='"Have a nice day foreigner,\nI need to work now."'>
-            </a-cylinder>
-        </a-entity>
-
-        <!-- 3rd SCENE -->
-        <a-entity id="scene3" class="scene" visible="false">
-            <a-cylinder class="interactive" position="-1.25 0.75 -4" scale="0.5 3 0.5" visible="false" drop="a cross"
-                over="goal" goal='"Well, seems we have a thief here!\nYou are under arrest..."'
-                fail='"Goodmorning!\nEverything looks perfect today..."'>
-            </a-cylinder>
-        </a-entity>
-
-        <!-- 4th SCENE -->
-        <a-entity id="scene4" class="scene" visible="false">
-            <a-cylinder class="interactive" position="4 2 1" scale="0.5 1 0.5" visible="false" drop="some money"
-                over="goal" goal="You made it...\nYou are free to sail away!"
-                fail='"Hello there,\nno place for you on my boat..."'>
-            </a-cylinder>
-        </a-entity>
-
-        <!-- 5th SCENE -->
-        <a-entity id="scene5" class="scene" visible="false">
-            <a-cylinder class="interactive" position="-4 -1.5 2.5" visible="false" drop="some money"
-                goal='"God bless you stranger!"\n' fail='"I am old, sick and hungry..."\n'>
-            </a-cylinder>
-        </a-entity>
-
-        <!-- 6th SCENE -->
-        <a-entity id="scene6" class="scene" visible="false">
-            <a-cylinder class="interactive" position="60 5 85" rotation="0 -150 0" radius="3" height="30"
-                color="goldenrod" pick="a cross">
-                <a-cylinder position="0 6 0" radius="3" height="15" rotation="0 0 90" color="goldenrod"></a-cylinder>
-                <a-cylinder position="0 -15 0" color="goldenrod" radius="5" height="2"></a-cylinder>
-            </a-cylinder>
-        </a-entity>
 
     </a-scene>
 </body>
