@@ -3,36 +3,30 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand View Hotel</title>
 
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <script>
-        /*
-            MAP:
-            scene1 -> NORTH -> scene2
-            scene2 -> EAST  -> scene3
-            scene3 -> EAST  -> scene4
-            scene4 -> EAST  -> scene5
-            scene5 -> EAST  -> scene6
-        */
         const MAP = [
-           [6, 5, 4, 3, 2],
-    [0, 0, 0, 0, 1]
+            [0, 0, 3],
+            [0, 2, 0],
+            [0, 1, 0]
         ];
 
         let ITEMS = [];
 
         const TEXT = [
-            'You got a call late at night that a serial killer is in a hotel.\nYou are standing in front of the Grand View Hotel.\nLook forward and use the NORTH arrow to enter the hotel.',
+            'You got a call late at night that a serial killer is hiding inside the Grand View Hotel.\nYou are standing outside the hotel.\nBefore entering, take your pistol.',
 
-            'A girl is waiting in the lobby of the hotel, shaking with fear:\n"Thank god you are finally here!"\nLook to the right and use the EAST arrow to go upstairs to the hallway.',
+            'You enter the lobby.\nA girl is waiting, shaking with fear:\n"Thank God you are finally here! He went upstairs... please be careful."\nLook left at the stairs and go upstairs.',
 
-            'Now you are upstairs investigating.\nIn the middle of the hallway you see an open door.\nUse the EAST arrow to enter the room.',
+            'You are now upstairs in the hallway.\nIn front of you, there is an open door.\nGo through the open door.',
 
-            'You walk inside the room.\nA frightening man is sitting on the bed in a dirty room, watching TV...\nUse the EAST arrow to continue.',
+            'You walk inside the room.\nA frightening man is sitting on the bed in a dirty room, watching TV.\nClick on him to continue.',
 
-            '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\nThat is all they see now...\nMaybe I should stop fighting it.\nUse the EAST arrow to continue.',
+            '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\nThat is all they see now...\nMaybe I should stop fighting it.\nClick on him again.',
 
             'I was ready to pull out my gun, but I underestimated how fast he was despite his enormous figure.\nHe grabbed me by the collar and that was the last thing I saw.'
         ];
@@ -42,7 +36,12 @@
 </head>
 
 <body>
-    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .interactive" game-logic>
+    <a-scene
+        vr-mode-ui="enabled: true"
+        device-orientation-permission-ui="enabled: true"
+        cursor="rayOrigin: mouse"
+        raycaster="objects: .interactive"
+        game-logic>
 
         <a-assets>
             <img id="sky1" src="scene1.png">
@@ -58,7 +57,7 @@
         <a-camera wasd-controls="enabled:false">
 
             <a-plane color="#000"
-                     height="0.42"
+                     height="0.45"
                      width="2"
                      opacity="0.55"
                      position="0 -0.62 -1">
@@ -109,14 +108,67 @@
             <a-cursor fuse="true"></a-cursor>
         </a-camera>
 
-        <a-entity id="scene1" class="scene"></a-entity>
+        <a-entity id="scene1" class="scene">
+            <a-box class="interactive"
+                   position="0 1 -3"
+                   scale="0.45 0.18 0.18"
+                   color="#111"
+                   pick="a pistol">
+            </a-box>
+        </a-entity>
+
         <a-entity id="scene2" class="scene" visible="false"></a-entity>
+
         <a-entity id="scene3" class="scene" visible="false"></a-entity>
-        <a-entity id="scene4" class="scene" visible="false"></a-entity>
-        <a-entity id="scene5" class="scene" visible="false"></a-entity>
+
+        <a-entity id="scene4" class="scene" visible="false">
+            <a-cylinder class="interactive"
+                        position="0 1.3 -3"
+                        radius="0.8"
+                        height="2"
+                        color="#111"
+                        drop="a pistol"
+                        pick="scene5"
+                        goal="You point your pistol at him.\nHe slowly stands up from the bed..."
+                        fail="You reach for your pistol, but you are not carrying it.">
+            </a-cylinder>
+        </a-entity>
+
+        <a-entity id="scene5" class="scene" visible="false">
+            <a-cylinder class="interactive"
+                        position="0 1.3 -3"
+                        radius="0.8"
+                        height="2"
+                        color="#111"
+                        pick="scene6">
+            </a-cylinder>
+        </a-entity>
+
         <a-entity id="scene6" class="scene" visible="false"></a-entity>
 
     </a-scene>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const scene = document.querySelector('a-scene');
+
+            scene.addEventListener('click', function (evt) {
+                const target = evt.target;
+
+                if (target.getAttribute('pick') === 'scene5') {
+                    setTimeout(function () {
+                        document.querySelector('[game-logic]').components['game-logic'].loadScene(5);
+                    }, 500);
+                }
+
+                if (target.getAttribute('pick') === 'scene6') {
+                    setTimeout(function () {
+                        document.querySelector('[game-logic]').components['game-logic'].loadScene(6);
+                    }, 500);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
