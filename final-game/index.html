@@ -65,21 +65,13 @@
 </head>
 
 <body>
-   <audio autoplay loop>
-    <source src="GRANDVIEW.mp3" type="audio/mpeg">
-   </audio>
 
-   <script>
-document.addEventListener("click", function () {
-    document.getElementById("bgMusic").play();
-}, { once: true });
-</script>
  <div id="intro">
 
     <h1>Grand View Hotel</h1>
 
     <h2>Νίκος Γκίνης</h2>
-    <h2>Μαρία Μπάτση<h2>
+    <h2>Μαρία Μπάτση</h2>
 
     <h2>Σενάριο</h2>
     <p>
@@ -114,6 +106,8 @@ document.addEventListener("click", function () {
             <img id="sky4" src="scene4.png">
             <img id="sky5" src="scene5.png">
             <img id="sky6" src="scene6.png">
+
+           <audio id="bgMusic" src=GRANDVIEW.mp3" preload="auto"></audio>
         </a-assets>
 
         <a-sky id="sky" rotation="0 -90 0"></a-sky>
@@ -178,13 +172,14 @@ document.addEventListener("click", function () {
         <a-entity id="scene4" class="scene" visible="false"></a-entity>
         <a-entity id="scene5" class="scene" visible="false"></a-entity>
         <a-entity id="scene6" class="scene" visible="false"></a-entity>
+        <a-entity sound="src: #bgMusic; autoplay: false; loop: true; volume: 0.5"></a-entity>
 
     </a-scene>
    <script>
 function startGame() {
     document.getElementById("intro").style.display = "none";
+    document.querySelector('[sound]').components.sound.playSound();
 }
 </script>
-</body>
-
-</html>
+    </body>
+    </html>
