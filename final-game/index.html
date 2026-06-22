@@ -172,13 +172,15 @@
         <a-entity id="scene4" class="scene" visible="false"></a-entity>
         <a-entity id="scene5" class="scene" visible="false"></a-entity>
         <a-entity id="scene6" class="scene" visible="false"></a-entity>
-        <a-entity sound="src: #bgMusic; autoplay: false; loop: true; volume: 0.5"></a-entity>
+        <a-entity id="music" sound="src: #bgMusic; autoplay: false; loop: true; volume: 0.5"></a-entity>
 
     </a-scene>
-   <script>
+  <script>
 function startGame() {
     document.getElementById("intro").style.display = "none";
-    document.querySelector('[sound]').components.sound.playSound();
+
+    const music = document.querySelector("#music");
+    music.components.sound.playSound();
 }
 </script>
     </body>
