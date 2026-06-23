@@ -42,13 +42,13 @@ let ITEMS = [];
 const TEXT = [
     'You got a call late at night that a serial killer is in a hotel.\nYou are standing in front of the Grand View Hotel.',
 
-    'A girl is waiting in the lobby of the hotel, shaking with fear:\n"Thank god you are finally here!"',
+    'A girl is waiting in the lobby of the hotel, shaking with fear:\n"Thank god you are finally here! Please take the key for the room!"',
 
     'Now you are upstairs investigating.\nIn the middle of the hallway you see an open door.',
 
     'You walk inside the room.\nA frightening man is sitting on the bed in a dirty room, watching TV...',
 
-    '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\nThat is all they see now...Maybe I should stop fighting it.',
+    '"You know what hurts me the most?\nNobody asked if it was true.\nThey saw a face on the news and that was enough."\n"Killer. Monster. Psycho."\nThat is all they see now...\nMaybe I should stop fighting it.',
 
     'I was ready to pull out my gun, but I underestimated how fast he was despite his enormous figure.\nHe grabbed me by the collar and that was the last thing I saw.'
 ];
@@ -107,14 +107,14 @@ const TEXT = [
     <a-camera wasd-controls="enabled:false">
 
         <a-plane color="#000"
-                 height="0.70"
-                 width="2.5"
-                 opacity="0.45"
+                 height="0.52"
+                 width="2"
+                 opacity="0.55"
                  position="0 -0.62 -1">
 
             <a-text id="info"
                     value=""
-                    width="1"
+                    width="1.75"
                     align="center"
                     font="monoid"
                     color="white"
@@ -160,7 +160,35 @@ const TEXT = [
 
     <a-entity id="scene1" class="scene"></a-entity>
 
-    <a-entity id="scene2" class="scene" visible="false"></a-entity>
+    <!-- SCENE 2: ΚΛΕΙΔΙ ΠΑΝΩ ΣΤΟΝ ΠΑΓΚΟ ΔΕΞΙΑ -->
+    <a-entity id="scene2" class="scene" visible="false">
+
+        <a-box class="interactive"
+               position="2 0.6 -3"
+               width="0.15"
+               height="0.05"
+               depth="0.05"
+               color="gold"
+               pick="a key"
+               goal="The girl gives you the room key.">
+
+            <a-box position="0.08 -0.02 0"
+                   width="0.05"
+                   height="0.02"
+                   depth="0.05"
+                   color="gold">
+            </a-box>
+
+            <a-box position="0.12 -0.01 0"
+                   width="0.03"
+                   height="0.04"
+                   depth="0.05"
+                   color="gold">
+            </a-box>
+
+        </a-box>
+
+    </a-entity>
 
     <a-entity id="scene3" class="scene" visible="false"></a-entity>
 
@@ -168,12 +196,11 @@ const TEXT = [
 
     <a-entity id="scene5" class="scene" visible="false"></a-entity>
 
-    <!-- SCENE 6 -->
+    <!-- SCENE 6: ΟΠΛΟ ΑΡΙΣΤΕΡΑ ΚΑΙ ΚΟΝΤΑ ΣΤΗΝ ΚΑΜΕΡΑ -->
     <a-entity id="scene6" class="scene" visible="false">
 
-        <!-- ΤΟ A-BOX ΕΙΝΑΙ ΤΟ ΔΙΑΔΡΑΣΤΙΚΟ ITEM -->
         <a-box class="interactive"
-               position="0 1.2 -4"
+               position="-1.5 1 -2"
                width="0.55"
                height="0.15"
                depth="0.15"
@@ -181,7 +208,6 @@ const TEXT = [
                pick="a gun"
                goal="You picked up the gun.">
 
-            <!-- κάννη -->
             <a-cylinder position="0.45 0 0"
                         radius="0.04"
                         height="0.55"
@@ -189,7 +215,6 @@ const TEXT = [
                         color="black">
             </a-cylinder>
 
-            <!-- λαβή -->
             <a-box position="-0.15 -0.25 0"
                    width="0.17"
                    height="0.38"
@@ -198,18 +223,21 @@ const TEXT = [
                    color="#444">
             </a-box>
 
-            <!-- σκανδάλη -->
-            <a-torus position="-1.5 1 -2"
+            <a-torus position="0 -0.12 0"
                      radius="0.08"
                      radius-tubular="0.01"
                      rotation="90 0 0"
                      color="gray">
             </a-torus>
-   </a-box>
-  </a-entity>
-  <a-entity id="music"
+
+        </a-box>
+
+    </a-entity>
+
+    <a-entity id="music"
               sound="src: #bgMusic; autoplay: false; loop: true; volume: 0.5">
     </a-entity>
+
 </a-scene>
 
 <script>
