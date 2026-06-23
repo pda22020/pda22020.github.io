@@ -107,14 +107,14 @@ const TEXT = [
     <a-camera wasd-controls="enabled:false">
 
         <a-plane color="#000"
-                 height="0.52"
-                 width="2"
-                 opacity="0.55"
+                 height="0.70"
+                 width="2.5"
+                 opacity="0.45"
                  position="0 -0.62 -1">
 
             <a-text id="info"
                     value=""
-                    width="1.75"
+                    width="1"
                     align="center"
                     font="monoid"
                     color="white"
@@ -205,15 +205,11 @@ const TEXT = [
                      rotation="90 0 0"
                      color="gray">
             </a-torus>
-
-        </a-box>
-
-    </a-entity>
-
-    <a-entity id="music"
+   </a-box>
+  </a-entity>
+  <a-entity id="music"
               sound="src: #bgMusic; autoplay: false; loop: true; volume: 0.5">
     </a-entity>
-
 </a-scene>
 
 <script>
